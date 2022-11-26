@@ -85,7 +85,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
         if not user:
             raise exceptions.AuthenticationFailed(
-                f"We didn't find a Notion account for this {username} address or phone number.",
+                f"We didn't find a Notion account for this {username} account.",
                 status.HTTP_401_UNAUTHORIZED,
             )
         return {
