@@ -67,5 +67,23 @@ class EmailPhoneUserManager(BaseUserManager):
     def create_user(self, email_or_phone, password=None, **extra_fields):
         return self._create_user(email_or_phone, password, False, False, **extra_fields)
 
-    def create_superuser(self, email_or_phone, password, **extra_fields):
-        return self._create_user(email_or_phone, password, True, True, **extra_fields)
+    def _create_superuser(
+        self, username, password, is_staff, is_superuser, **extra_fields
+    ):
+        user = self.model(
+            username=username,
+            is_staff=is_staff,
+            is_active=True,
+            is_superuser=is_superuser,
+            last_login=timezone.now(),
+            date_joined=timezone.now(),
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, password, **extra_fields):
+        return self._create_superuser(
+            username, password, is_staff=True, is_superuser=True, **extra_fields
+        )

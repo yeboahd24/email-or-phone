@@ -9,7 +9,10 @@ from django.contrib.auth import login as auth_login
 
 from django.contrib.auth import get_user_model
 from .serializers import UserRegisterSerializer, UsersListSerializer, LoginSerializer
-from .models import EmailPhoneUser
+from .models import EmailPhoneUser, Device
+from .utils import *
+from django.utils import timezone
+
 
 # Create your views here.
 
@@ -60,7 +63,9 @@ class LoginView(APIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(
+            context={"request": request}, data=request.data
+        )
         if serializer.is_valid(raise_exception=True):
             username = serializer.validated_data["username"]
             password = request.POST.get("password")
@@ -74,7 +79,20 @@ class LoginView(APIView):
                 password=password,
                 backend="phone.authenticate.PhoneModelBackend",
             )
+
             refresh = RefreshToken.for_user(user_login)
+            device_name, device_details = get_device_details(
+                request.META, str(refresh.access_token)
+            )
+            device = Device.objects.create(
+                user=user_login,
+                last_request_datetime=timezone.now(),
+                name=device_name,
+                details=device_details,
+                permanent_token=refresh,
+            )
+            device.save()
+
             auth_login(request, user_login)
 
             res = {

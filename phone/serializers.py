@@ -4,7 +4,9 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext as _
 from django.contrib.auth import authenticate
 from django.contrib.auth import password_validation as validators
-
+from .models import Device
+from .utils import *
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -82,6 +84,19 @@ class LoginSerializer(serializers.ModelSerializer):
         password = attrs.get("password", "")
 
         user = authenticate(username=username, password=password)
+        # token = self.context["access"].META
+        # device_name, device_details = get_device_details(
+        #     self.context["request"].META, token
+        # )
+        # print("token", token)
+        # device = Device.objects.create(
+        #     user=user,
+        #     last_request_datetime=timezone.now(),
+        #     name=device_name,
+        #     details=device_details,
+        #     permanent_token=token,
+        # )
+        # device.save()
 
         if not user:
             raise exceptions.AuthenticationFailed(
