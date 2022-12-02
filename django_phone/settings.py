@@ -194,3 +194,5 @@ SIMPLE_JWT = {
 }
 
 JWT_PERMANENT_TOKEN_AUTH = (True,)
+DEFAULT_FROM_EMAIL = "admin@gmail.com"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

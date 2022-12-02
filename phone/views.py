@@ -81,6 +81,7 @@ class LoginView(APIView):
             )
 
             refresh = RefreshToken.for_user(user_login)
+            ip_address = get_ip_address(request)
             device_name, device_details = get_device_details(
                 request.META, str(refresh.access_token)
             )
@@ -90,10 +91,17 @@ class LoginView(APIView):
                 name=device_name,
                 details=device_details,
                 permanent_token=refresh,
+                ip_address=ip_address,
             )
             device.save()
 
             auth_login(request, user_login)
+            user = get_user_model().objects.get(username=username)
+            user_device = Device.objects.filter(user=user).first()
+            # print(user.device)
+            print(user_device.ip_address)
+            if user_device.ip_address != ip_address or user_device.device.name != device_name:
+                warning_mail_send(username, ip_address)
 
             res = {
                 "refresh": str(refresh),

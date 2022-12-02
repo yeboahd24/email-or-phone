@@ -33,7 +33,6 @@ class DeviceAdmin(admin.ModelAdmin):
         "name",
         "created",
         "last_request_datetime",
-        "permanent_token",
     ]
     list_filter = [
         "id",
@@ -50,6 +49,7 @@ class DeviceAdmin(admin.ModelAdmin):
         "created",
         "last_request_datetime",
         "permanent_token",
+        "ip_address",
     ]
     readonly_fields = fields
 

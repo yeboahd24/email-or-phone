@@ -3,13 +3,50 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
 )
+
+import binascii
+import os
+import uuid
+
+from django.conf import settings
+from django.db import models
+from django.utils.translation import gettext as _
 from django.core import validators
 from django.core.mail import send_mail
-from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .managers import EmailPhoneUserManager
+
+
+
+
+
+class Device(models.Model):
+    """
+    Device model used for permanent token authentication
+    """
+
+    permanent_token = models.CharField(max_length=255, unique=True)
+    jwt_secret = models.UUIDField(default=uuid.uuid4, editable=False)
+    created = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user")
+    name = models.CharField(_("Device name"), max_length=255)
+    details = models.CharField(_("Device details"), max_length=255, blank=True)
+    last_request_datetime = models.DateTimeField(auto_now=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    # def save(self, *args, **kwargs):
+    #     if not self.permanent_token:
+    #         self.permanent_token = self.generate_key()
+
+    #     return super(Device, self).save(*args, **kwargs)
+
+    # def generate_key(self):
+    #     return binascii.hexlify(os.urandom(20)).decode()
+
+    def __str__(self):
+        return self.user.username
 
 
 class AbstractEmailPhoneUser(AbstractBaseUser, PermissionsMixin):
@@ -55,6 +92,7 @@ class AbstractEmailPhoneUser(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+    device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name="device", null=True)
 
     objects = EmailPhoneUserManager()
 
@@ -89,33 +127,3 @@ class EmailPhoneUser(AbstractEmailPhoneUser):
         swappable = "AUTH_USER_MODEL"
 
 
-import binascii
-import os
-import uuid
-
-from django.conf import settings
-from django.db import models
-from django.utils.translation import gettext as _
-
-
-class Device(models.Model):
-    """
-    Device model used for permanent token authentication
-    """
-
-    permanent_token = models.CharField(max_length=255, unique=True)
-    jwt_secret = models.UUIDField(default=uuid.uuid4, editable=False)
-    created = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    name = models.CharField(_("Device name"), max_length=255)
-    details = models.CharField(_("Device details"), max_length=255, blank=True)
-    last_request_datetime = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        if not self.permanent_token:
-            self.permanent_token = self.generate_key()
-
-        return super(Device, self).save(*args, **kwargs)
-
-    def generate_key(self):
-        return binascii.hexlify(os.urandom(20)).decode()
