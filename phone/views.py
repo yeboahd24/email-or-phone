@@ -12,6 +12,11 @@ from .serializers import UserRegisterSerializer, UsersListSerializer, LoginSeria
 from .models import EmailPhoneUser, Device
 from .utils import *
 from django.utils import timezone
+from django.contrib import messages
+from .models import Subscriber
+from django.db import IntegrityError
+from .tasks import async_send_newsletter
+from django.shortcuts import redirect
 
 
 # Create your views here.
@@ -99,8 +104,10 @@ class LoginView(APIView):
             user = get_user_model().objects.get(username=username)
             user_device = Device.objects.filter(user=user).first()
             # print(user.device)
-            print(user_device.ip_address)
-            if user_device.ip_address != ip_address or user_device.device.name != device_name:
+            if (
+                user_device.ip_address != ip_address
+                or user_device.device.name != device_name
+            ):
                 warning_mail_send(username, ip_address)
 
             res = {
@@ -108,3 +115,33 @@ class LoginView(APIView):
                 "access": str(refresh.access_token),
             }
             return Response(res, status=status.HTTP_200_OK)
+
+
+
+
+def subscribe(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        subscriber = Subscriber(email=email, confirmed=True)
+        if subscriber == Subscriber.objects.filter(email=subscriber.email):
+            messages.error(request, 'You are already subscribed to our newsletter!')
+            return redirect('login')
+        else:
+            try:
+                subscriber.save()
+                async_send_newsletter.delay()
+                messages.success(request, 'You have been subscribed to our newsletter!')
+                return redirect('login')
+            except IntegrityError as e:
+                messages.error(request, 'You are already subscribed to our newsletter!')
+                return redirect('login')
+    else:
+        return redirect('login')
+
+
+def unsubscribe(request):
+    confirme_subscribers = Subscriber.objects.get(email=request.GET['email'])
+    for subscriber in confirme_subscribers:
+        subscriber.delete()
+        messages.success(request, 'You have successfully unsubscribed from our newsletter!')
+        return redirect('login')

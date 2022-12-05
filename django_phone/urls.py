@@ -45,6 +45,8 @@ urlpatterns = [
         name="redoc",
     ),
     path('api-auth/', include('rest_framework.urls')),
+    path('subscribe/', subscribe, name='subscribe'),
+    path('unsubscribe/', unsubscribe, name='unsubscribe'),
 
 ]
 

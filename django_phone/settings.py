@@ -61,7 +61,7 @@ ROOT_URLCONF = "django_phone.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -196,3 +196,22 @@ SIMPLE_JWT = {
 JWT_PERMANENT_TOKEN_AUTH = (True,)
 DEFAULT_FROM_EMAIL = "admin@gmail.com"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+SESSION_COOKIE_DOMAIN = "localhost"
+# set this to True in production
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_AGED = 1209600  # 2 weeks
+# PERSISTENT_SESSION_KEY = "persistent"
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_NAME = "sessionid"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+
+# Celery Configurations
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'

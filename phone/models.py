@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .managers import EmailPhoneUserManager
+from .common_fields import BaseModel
 
 
 
@@ -46,7 +47,7 @@ class Device(models.Model):
     #     return binascii.hexlify(os.urandom(20)).decode()
 
     def __str__(self):
-        return self.user.username
+        return self.name
 
 
 class AbstractEmailPhoneUser(AbstractBaseUser, PermissionsMixin):
@@ -127,3 +128,15 @@ class EmailPhoneUser(AbstractEmailPhoneUser):
         swappable = "AUTH_USER_MODEL"
 
 
+
+
+class Subscriber(BaseModel):
+    email = models.EmailField(unique=True, verbose_name='Email')
+    confirmed = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Subscriber'
+        verbose_name_plural = 'Subscribers'
+
+    def __str__(self):
+        return self.email + " (" + ("not " if not self.confirmed else "") + "confirmed)"
