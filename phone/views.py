@@ -17,7 +17,7 @@ from .models import Subscriber
 from django.db import IntegrityError
 from .tasks import async_send_newsletter
 from django.shortcuts import redirect
-
+from .mixins import DeviceMixin
 
 # Create your views here.
 
@@ -117,31 +117,67 @@ class LoginView(APIView):
             return Response(res, status=status.HTTP_200_OK)
 
 
+# Login with Mixin
+
+
+class LoginView2(APIView, DeviceMixin):
+    permission_classes = [
+        AllowAny,
+    ]
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(
+            context={"request": request}, data=request.data
+        )
+        if serializer.is_valid(raise_exception=True):
+            username = serializer.validated_data["username"]
+            password = request.POST.get("password")
+
+            user_login = authenticate(
+                username=username,
+                password=password,
+                backend="phone.authenticate.EmailModelBackend",
+            ) or authenticate(
+                username=username,
+                password=password,
+                backend="phone.authenticate.PhoneModelBackend",
+            )
+
+            refresh = RefreshToken.for_user(user_login)
+
+            res = {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }
+            return Response(res, status=status.HTTP_200_OK)
 
 
 def subscribe(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
+    if request.method == "POST":
+        email = request.POST.get("email")
         subscriber = Subscriber(email=email, confirmed=True)
         if subscriber == Subscriber.objects.filter(email=subscriber.email):
-            messages.error(request, 'You are already subscribed to our newsletter!')
-            return redirect('login')
+            messages.error(request, "You are already subscribed to our newsletter!")
+            return redirect("login")
         else:
             try:
                 subscriber.save()
                 async_send_newsletter.delay()
-                messages.success(request, 'You have been subscribed to our newsletter!')
-                return redirect('login')
+                messages.success(request, "You have been subscribed to our newsletter!")
+                return redirect("login")
             except IntegrityError as e:
-                messages.error(request, 'You are already subscribed to our newsletter!')
-                return redirect('login')
+                messages.error(request, "You are already subscribed to our newsletter!")
+                return redirect("login")
     else:
-        return redirect('login')
+        return redirect("login")
 
 
 def unsubscribe(request):
-    confirme_subscribers = Subscriber.objects.get(email=request.GET['email'])
+    confirme_subscribers = Subscriber.objects.get(email=request.GET["email"])
     for subscriber in confirme_subscribers:
         subscriber.delete()
-        messages.success(request, 'You have successfully unsubscribed from our newsletter!')
-        return redirect('login')
+        messages.success(
+            request, "You have successfully unsubscribed from our newsletter!"
+        )
+        return redirect("login")

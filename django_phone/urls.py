@@ -31,6 +31,8 @@ urlpatterns = [
     path("register/", UserRegisterView.as_view(), name="register"),
     path("users/", UsersListView.as_view(), name="users"),
     path("login/", LoginView.as_view(), name="login"),
+    path("login2/", LoginView.as_view(), name="login"),
+
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
