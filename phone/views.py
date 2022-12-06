@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
@@ -17,7 +18,7 @@ from .models import Subscriber
 from django.db import IntegrityError
 from .tasks import async_send_newsletter
 from django.shortcuts import redirect
-from .mixins import DeviceMixin
+from .mixins import DeviceMixin, LoginThrottlingMixin
 
 # Create your views here.
 
@@ -120,7 +121,7 @@ class LoginView(APIView):
 # Login with Mixin
 
 
-class LoginView2(APIView, DeviceMixin):
+class LoginView2(APIView,LoginThrottlingMixin, DeviceMixin):
     permission_classes = [
         AllowAny,
     ]
