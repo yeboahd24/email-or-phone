@@ -94,6 +94,8 @@ class AbstractEmailPhoneUser(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
     device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name="device", null=True)
+    date_locked = models.DateTimeField(null=True, blank=True)
+
 
     objects = EmailPhoneUserManager()
 

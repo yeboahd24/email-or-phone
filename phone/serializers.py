@@ -84,6 +84,9 @@ class LoginSerializer(serializers.ModelSerializer):
         password = attrs.get("password", "")
 
         user = authenticate(username=username, password=password)
+        user_test = User.objects.get(username=username)
+        print("is_active", user_test.is_active)
+
         # token = self.context["access"].META
         # device_name, device_details = get_device_details(
         #     self.context["request"].META, token

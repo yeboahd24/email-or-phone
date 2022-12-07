@@ -121,7 +121,7 @@ class LoginView(APIView):
 # Login with Mixin
 
 
-class LoginView2(APIView,LoginThrottlingMixin, DeviceMixin):
+class LoginView2(APIView, DeviceMixin):
     permission_classes = [
         AllowAny,
     ]
