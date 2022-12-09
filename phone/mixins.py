@@ -36,7 +36,6 @@ class DeviceMixin(mixins.CreateModelMixin):
 class LoginThrottlingMixin(mixins.CreateModelMixin):
     login_attempts_allowed = 3
     login_attempt_timeout = 5 # minutes
-    print("mixins.LoginThrottlingMixin")
     def create(self, request, *args, **kwargs):
         print("locked testing")
         if request.user.is_authenticated:
