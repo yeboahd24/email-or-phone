@@ -32,7 +32,6 @@ urlpatterns = [
     path("users/", UsersListView.as_view(), name="users"),
     path("login/", LoginView.as_view(), name="login"),
     path("login2/", LoginView.as_view(), name="login"),
-
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -46,10 +45,9 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    path('api-auth/', include('rest_framework.urls')),
-    path('subscribe/', subscribe, name='subscribe'),
-    path('unsubscribe/', unsubscribe, name='unsubscribe'),
-
+    path("api-auth/", include("rest_framework.urls")),
+    path("subscribe/", subscribe, name="subscribe"),
+    path("unsubscribe/", unsubscribe, name="unsubscribe"),
+    path("auth/", include("trench.urls")),
+    path("auth/", include("trench.urls.jwt")),
 ]
-
-

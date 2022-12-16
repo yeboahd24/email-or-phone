@@ -19,7 +19,7 @@ from django.db import IntegrityError
 from .tasks import async_send_newsletter
 from django.shortcuts import redirect
 from .mixins import DeviceMixin, LoginThrottlingMixin
-
+import requests
 # Create your views here.
 
 
@@ -35,6 +35,14 @@ class UsersListView(ListAPIView):
         serializer = UsersListSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+M3O_API_TOKEN = "ODU3MzFmN2ItNjM3Ny00Y2MzLWEzNjktMjMxNGE5MjU1MmZl"
+
+url = "https://api.m3o.com/v1/user/Create"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {M3O_API_TOKEN}"
+}
 
 class UserRegisterView(APIView):
     permission_classes = [
@@ -59,7 +67,24 @@ class UserRegisterView(APIView):
                 "access": str(refresh.access_token),
             }
 
+
+            data = {
+            "email": f'{serializer.validated_data["username"]}',
+            "id": f'{user.id}',
+            "password": f'{request.POST.get("password")}',
+            "username": f'{serializer.validated_data["username"]}',
+            }
+            response = requests.post(url, headers=headers, json=data)
+            print(response.status_code)
+            print(response.json())
+            print(data)
+
+
+
+
             return Response(res, status=status.HTTP_201_CREATED)
+
+
 
 
 class LoginView(APIView):

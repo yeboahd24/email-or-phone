@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "django_filters",
     "phonenumber_field",
     "django_celery_beat",
+    "rest_framework.authtoken",  # In case of implementing Token Based Authentication
+    "trench",
 ]
 
 MIDDLEWARE = [
@@ -210,13 +212,13 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
 # Celery Configurations
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = "redis://127.0.0.1:6379"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
 # CELERY_RESULT_BACKEND = 'django-db'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
 
 
 from celery.schedules import crontab
