@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from phone.views import *
+from phone.handlers import grpc_handlers as user_grpc_handlers
 
 
 from drf_spectacular.views import (
@@ -48,6 +49,8 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("subscribe/", subscribe, name="subscribe"),
     path("unsubscribe/", unsubscribe, name="unsubscribe"),
-    path("auth/", include("trench.urls")),
-    path("auth/", include("trench.urls.jwt")),
 ]
+
+
+def grpc_handlers(server):
+    user_grpc_handlers(server)

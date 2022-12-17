@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+package user_proto;
+
+
+// Define the service for registering a user
+service UserService {
+  // The RegisterUser method takes a user as input and returns an empty response
+  rpc RegisterUser (User) returns (google.protobuf.Empty) {}
+}
+
+
+// Define the message type for a user
+message User {
+  string username = 1;
+  string password = 2;
+}

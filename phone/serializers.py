@@ -7,6 +7,8 @@ from django.contrib.auth import password_validation as validators
 from .models import Device
 from .utils import *
 from django.utils import timezone
+from django_grpc_framework import generics, proto_serializers
+from user_proto import user_pb2
 
 User = get_user_model()
 
@@ -110,3 +112,69 @@ class LoginSerializer(serializers.ModelSerializer):
             "username": user.username,
             "phone_number": user.phone,
         }
+
+
+
+
+
+
+class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
+    # password = serializers.CharField(
+    #     write_only=True,
+    #     required=True,
+    #     style={"input_type": "password"},
+    # )
+
+    class Meta:
+        model = User
+        proto_class = user_pb2.User
+        fields = [
+            "username",
+            "password",
+        ]
+
+    def validate(self, data):
+        if not data.get("password"):
+            raise serializers.ValidationError("Please enter a password and")
+
+        user = User(**data)
+        password = data.get("password")
+        errors = dict()
+        try:
+            validators.validate_password(password=password, user=user)
+        except exceptions.ValidationError as e:
+            errors["password"] = list(e.messages)
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super().validate(data)
+
+    def create(self, validated_data):
+        username = validated_data["username"]
+        password = validated_data["password"]
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError(
+                {"detail": "phone number or email addresses must be unique."}
+            )
+        user = User.objects.create_user(email_or_phone=username)
+        user.set_password(password)
+        user.save()
+        return user
+        # return supe
+
+
+# from django.contrib.auth.hashers import make_password
+
+# class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
+   
+
+#     class Meta:
+#         model = User
+#         proto_class = user_pb2.User
+#         fields = ['username', 'password']
+
+#     def create(self, validated_data):
+#         user = User.objects.create(
+#             username=validated_data['username'],
+#             password=make_password(validated_data['password'])
+#         )
+#         return user
