@@ -18,6 +18,7 @@ cookiecutter==2.1.1
 cryptography==38.0.4
 decouple
 Django
+gunicorn
 django-filter==22.1
 django-phonenumber-field==7.0.0
 djangorestframework==3.14.0
