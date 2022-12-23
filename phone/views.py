@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, format_lazy
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import ListAPIView, CreateAPIView
@@ -9,7 +9,12 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 
 from django.contrib.auth import get_user_model
-from .serializers import UserRegisterSerializer, UsersListSerializer, LoginSerializer
+from .serializers import (
+    UserRegisterSerializer,
+    UsersListSerializer,
+    LoginSerializer,
+    UserProtoSerializer,
+)
 from .models import EmailPhoneUser, Device
 from .utils import *
 from django.utils import timezone
@@ -20,6 +25,8 @@ from .tasks import async_send_newsletter
 from django.shortcuts import redirect
 from .mixins import DeviceMixin, LoginThrottlingMixin
 import requests
+from .forms import WordForm
+
 # Create your views here.
 
 
@@ -41,8 +48,9 @@ M3O_API_TOKEN = "ODU3MzFmN2ItNjM3Ny00Y2MzLWEzNjktMjMxNGE5MjU1MmZl"
 url = "https://api.m3o.com/v1/user/Create"
 headers = {
     "Content-Type": "application/json",
-    "Authorization": f"Bearer {M3O_API_TOKEN}"
+    "Authorization": f"Bearer {M3O_API_TOKEN}",
 }
+
 
 class UserRegisterView(APIView):
     permission_classes = [
@@ -67,24 +75,18 @@ class UserRegisterView(APIView):
                 "access": str(refresh.access_token),
             }
 
-
             data = {
-            "email": f'{serializer.validated_data["username"]}',
-            "id": f'{user.id}',
-            "password": f'{request.POST.get("password")}',
-            "username": f'{serializer.validated_data["username"]}',
+                "email": f'{serializer.validated_data["username"]}',
+                "id": f"{user.id}",
+                "password": f'{request.POST.get("password")}',
+                "username": f'{serializer.validated_data["username"]}',
             }
             response = requests.post(url, headers=headers, json=data)
             print(response.status_code)
             print(response.json())
             print(data)
 
-
-
-
             return Response(res, status=status.HTTP_201_CREATED)
-
-
 
 
 class LoginView(APIView):
@@ -207,3 +209,33 @@ def unsubscribe(request):
             request, "You have successfully unsubscribed from our newsletter!"
         )
         return redirect("login")
+
+
+from django.conf import settings
+from django.shortcuts import render
+
+
+def get_definition(request):
+    if request.method == "POST":
+        form = WordForm(request.POST)
+        if form.is_valid():
+            api_key = settings.DICTIONARY_KEY
+            endpoint = "https://www.dictionaryapi.com/api/v3/references/thesaurus/json/"
+            word = form.cleaned_data["input"]
+            url = f"{endpoint}{word}?key={api_key}"
+            response = requests.get(url)
+            data = response.json()
+            # data = JsonResponse(response, safe=False)
+            synonyms = data[0]["meta"]["syns"][0]
+            meaning = data[0]["shortdef"][0]
+            return render(
+                request,
+                "dictionary.html",
+                {"synonyms": synonyms, "meaning": meaning, "word": word},
+            )
+    else:
+        form = WordForm()
+    return render(request, "dictionary.html", {"form": form})
+
+
+# https://www.dictionaryapi.com/api/v3/references/thesaurus/json/test?key=15b1025e-5041-4d7b-9f7b-4f74bd0deabe

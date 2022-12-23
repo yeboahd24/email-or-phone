@@ -20,3 +20,7 @@ class LoginForm(forms.ModelForm):
             raise forms.ValidationError("Invalid password, please try again.")
 
         return self.cleaned_data
+
+
+class WordForm(forms.Form):
+    input = forms.CharField(label="Enter a sentence or paragraph:")

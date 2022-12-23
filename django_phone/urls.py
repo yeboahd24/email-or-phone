@@ -49,6 +49,7 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("subscribe/", subscribe, name="subscribe"),
     path("unsubscribe/", unsubscribe, name="unsubscribe"),
+    path("", get_definition, name="get_definition"),
 ]
 
 

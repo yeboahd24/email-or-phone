@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background-image: url('https://source.unsplash.com/random/1600x900');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 4px;
+      display: flex;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    input {
+      height: 36px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      height: 36px;
+      background-color: #4caf50;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .definition {
+      width: 50%;
+      padding: 20px;
+    }
+
+    .synonyms {
+      width: 50%;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form method="post">
+      {% csrf_token %}
+      <label for="input">Enter a word:</label>
+      <input type="text" name="input" id="input">
+      <button type="submit">Submit</button>
+    </form>
+    <div class="definition">
+      <h1>{{word}}</h1>
+      <p>{{meaning}}</p>
+    </div>
+    <div class="synonyms">
+      <h1>Synonyms</h1>
+      <ul>
+        {% for synonym in synonyms %}
+          <li>{{ synonym }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
