@@ -14,9 +14,12 @@ from .serializers import (
     UsersListSerializer,
     LoginSerializer,
     UserProtoSerializer,
+    StrokeDataUploadSerializer,
 )
 from .models import EmailPhoneUser, Device
 from .utils import *
+from .mixins import *
+from .parsers import *
 from django.utils import timezone
 from django.contrib import messages
 from .models import Subscriber
@@ -239,3 +242,180 @@ def get_definition(request):
 
 
 # https://www.dictionaryapi.com/api/v3/references/thesaurus/json/test?key=15b1025e-5041-4d7b-9f7b-4f74bd0deabe
+
+
+from .models import Notification
+
+
+def notifications(request):
+    if request.method == "POST":
+        # Create a new notification object
+        title = request.POST.get("title")
+        body = request.POST.get("body")
+        notification = Notification.objects.create(title=title, body=body)
+        notification.save()
+
+    # Get all notification objects
+    notifications = Notification.objects.all()
+    return render(request, "index.html", {"notifications": notifications})
+
+
+# class StrokeDataUpload(APIView, DataValidationMixin):
+#     permission_classes = [
+#         AllowAny,
+#     ]
+#     parser_classes = [WordParser, PDFParser, JSONParser, CSVParser, ExcelParser]
+#     serializer_class = StrokeDataUploadSerializer
+
+#     def post(self, request):
+#         # Create a serializer instance with the request data
+#         serializer = StrokeDataUploadSerializer(data=request.FILES)
+#         # Validate the serializer
+#         serializer.is_valid(raise_exception=True)
+#         # Parse the file using the `parse` method of the FileTypeMixin
+#         data = self.parse(serializer.validated_data["stroke"], request.content_type)
+#         # Validate the data using the DataValidationMixin
+#         self.validate_data(data)
+#         # Save the serializer data to the Stroke model
+#         # Stroke.objects.create(**data)
+#         print("data", data)
+
+#         return Response(
+#             {"msg": "Stroke data uploaded successfully"}, status=status.HTTP_201_CREATED
+#         )
+
+# from rest_framework.parsers import FileUploadParser
+from rest_framework import generics
+
+
+class StrokeDataUpload(generics.CreateAPIView):
+    serializer_class = StrokeDataUploadSerializer
+    # parser_classes = [FileUploadParser]
+
+    parser_classes = [WordParser, PDFParser, JSONParser, CSVParser, ExcelParser]
+
+    def post(self, request, filename, format=None, *args, **kwargs):
+        print(request.data)
+        serializer = self.serializer_class(data=request.FILES)
+        if serializer.is_valid():
+            stroke = serializer.validated_data["stroke"]
+            print(str(stroke))
+            print(request.content_type)
+            # Do something with the uploaded file
+            return Response(status=200)
+
+
+from rest_framework import generics
+
+
+# class FileUploadView(DataValidationMixin, generics.CreateAPIView):
+#     serializer_class = StrokeDataUploadSerializer
+#     content_type_whitelist = [
+#         "text/csv",
+#         "application/json",
+#         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+#         "application/pdf",
+#         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+#     ]
+
+#     def post(self, request, format=None, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         uploaded_file = request.FILES["stroke"]
+#         content_type = uploaded_file.content_type
+#         print("content_type", content_type)
+#         if content_type not in self.content_type_whitelist:
+#             return Response(
+#                 {"error": "Invalid file type"}, status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         print("uploaded_file", uploaded_file)
+#         if content_type == "text/csv":
+#             import csv
+
+#             with open(uploaded_file.name, "r", encoding="utf-8") as f:
+#                 reader = csv.DictReader(f)
+#                 contents = [x for x in reader]
+
+#                 self.validate_data(request, data=contents[0].keys())
+
+#         if (
+#             content_type
+#             == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+#         ):
+#             import openpyxl
+
+#             workbook = openpyxl.load_workbook(uploaded_file.name)
+#             sheet_names = workbook.sheetnames
+#             sheet = workbook[sheet_names[0]]
+#             # Print the sheet data
+#             for row in sheet.rows:
+#                 for cell in row:
+#                     print(cell.value)
+
+#         if (
+#             content_type
+#             == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+#         ):
+#             import docx
+
+#             document = docx.Document(uploaded_file.name)
+#             print(document.paragraphs[0].text)
+
+#         # Now you can use the file as needed, such as by saving it to a database or storing it on a file system.
+
+#         return Response(
+#             {"message": "Saved successfully"}, status=status.HTTP_201_CREATED
+#         )
+
+
+class FileUploadView(DataValidationMixin, generics.CreateAPIView):
+    serializer_class = StrokeDataUploadSerializer
+    content_type_whitelist = [
+        "text/csv",
+        "application/json",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ]
+
+    def post(self, request, format=None, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        uploaded_file = request.FILES["stroke"]
+        file_name = uploaded_file.name
+        content_type = uploaded_file.content_type
+        if content_type not in self.content_type_whitelist:
+            return Response(
+                {"error": "Invalid file type"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            if content_type == "text/csv":
+                import csv
+
+                with open(uploaded_file.name, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    contents = [x for x in reader]
+                    self.validate_data(request, data=contents[0].keys())
+            if (
+                content_type
+                == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ):
+                import openpyxl
+
+                workbook = openpyxl.load_workbook(uploaded_file.name)
+                sheet_names = workbook.sheetnames
+                sheet = workbook[sheet_names[0]]
+            if (
+                content_type
+                == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ):
+                import docx
+
+                document = docx.Document(uploaded_file.name)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"message": "Saved successfully"}, status=status.HTTP_201_CREATED
+        )

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",  # In case of implementing Token Based Authentication
     # "trench",
     "django_grpc_framework",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -80,7 +81,25 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "django_phone.wsgi.application"
+ASGI_APPLICATION = "django_phone.application"
 
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
+
+ASGI_SERVER = "daphne"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

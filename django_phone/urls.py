@@ -50,6 +50,8 @@ urlpatterns = [
     path("subscribe/", subscribe, name="subscribe"),
     path("unsubscribe/", unsubscribe, name="unsubscribe"),
     path("", get_definition, name="get_definition"),
+    # path("not/", notifications, name="notifications"),
+    path("notifications/", include("phone.urls")),
 ]
 
 

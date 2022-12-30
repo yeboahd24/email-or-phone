@@ -20,9 +20,6 @@ from .managers import EmailPhoneUserManager
 from .common_fields import BaseModel
 
 
-
-
-
 class Device(models.Model):
     """
     Device model used for permanent token authentication
@@ -31,7 +28,9 @@ class Device(models.Model):
     permanent_token = models.CharField(max_length=255, unique=True)
     jwt_secret = models.UUIDField(default=uuid.uuid4, editable=False)
     created = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user"
+    )
     name = models.CharField(_("Device name"), max_length=255)
     details = models.CharField(_("Device details"), max_length=255, blank=True)
     last_request_datetime = models.DateTimeField(auto_now=True)
@@ -93,9 +92,10 @@ class AbstractEmailPhoneUser(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
-    device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name="device", null=True)
+    device = models.ForeignKey(
+        Device, on_delete=models.CASCADE, related_name="device", null=True
+    )
     date_locked = models.DateTimeField(null=True, blank=True)
-
 
     objects = EmailPhoneUserManager()
 
@@ -130,15 +130,19 @@ class EmailPhoneUser(AbstractEmailPhoneUser):
         swappable = "AUTH_USER_MODEL"
 
 
-
-
 class Subscriber(BaseModel):
-    email = models.EmailField(unique=True, verbose_name='Email')
+    email = models.EmailField(unique=True, verbose_name="Email")
     confirmed = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = 'Subscriber'
-        verbose_name_plural = 'Subscribers'
+        verbose_name = "Subscriber"
+        verbose_name_plural = "Subscribers"
 
     def __str__(self):
         return self.email + " (" + ("not " if not self.confirmed else "") + "confirmed)"
+
+
+class Notification(models.Model):
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

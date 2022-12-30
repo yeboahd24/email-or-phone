@@ -1,0 +1,71 @@
+<!-- templates/notifications/index.html -->
+
+
+<style>
+    /* static/css/style.css */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+#notification-list li {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#notification-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#notification-form input[type="text"] {
+    width: 100%;
+    font-size: 18px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+</style>
+
+<h1>Notifications</h1>
+
+<ul id="notification-list">
+{% for notification in notifications %}
+    <li>{{ notification.title }}: {{ notification.body }}</li>
+{% endfor %}
+</ul>
+
+<!-- templates/notifications/index.html -->
+
+<form id="notification-form" method="post">
+    {% csrf_token %}
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title">
+    <br>
+    <label for="body">Body:</label>
+    <input type="text" id="body" name="body">
+    <br>
+    <input type="submit" value="Send Notification">
+</form>
+
+
+<script>
+    var socket = new WebSocket('ws://localhost:8000/ws/notifications/');
+    console.log(socket);
+
+
+    socket.onmessage = function(e) {
+        console.log('Message:', e.data);
+        var notificationList = document.getElementById('notification-list');
+        var notification = document.createElement('li');
+        notification.innerText = e.data;
+        notificationList.appendChild(notification);
+    }
+
+    document.getElementById('notification-form').onsubmit = function(e) {
+        e.preventDefault();
+        var title = document.getElementById('title').value;
+        var body = document.getElementById('body').value;
+        socket.send(JSON.stringify({'title': title, 'body': body}));
+    }
+</script>

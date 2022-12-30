@@ -35,17 +35,22 @@ class DeviceMixin(mixins.CreateModelMixin):
 
 class LoginThrottlingMixin(mixins.CreateModelMixin):
     login_attempts_allowed = 3
-    login_attempt_timeout = 5 # minutes
+    login_attempt_timeout = 5  # minutes
+
     def create(self, request, *args, **kwargs):
         print("locked testing")
         if request.user.is_authenticated:
             # Do not throttle authenticated users
             return super().create(request, *args, **kwargs)
 
-        login_attempts = request.session.get('login_attempts', 0)
-        last_login_attempt = request.session.get('last_login_attempt')
+        login_attempts = request.session.get("login_attempts", 0)
+        last_login_attempt = request.session.get("last_login_attempt")
 
-        if last_login_attempt and (timezone.now() - last_login_attempt).total_seconds() / 60 < self.login_attempt_timeout:
+        if (
+            last_login_attempt
+            and (timezone.now() - last_login_attempt).total_seconds() / 60
+            < self.login_attempt_timeout
+        ):
             # User has already made a login attempt within the timeout period
             login_attempts += 1
         else:
@@ -54,15 +59,78 @@ class LoginThrottlingMixin(mixins.CreateModelMixin):
             request.user.is_active = True
             request.user.save()
 
-        request.session['login_attempts'] = login_attempts
-        request.session['last_login_attempt'] = timezone.now()
+        request.session["login_attempts"] = login_attempts
+        request.session["last_login_attempt"] = timezone.now()
 
         if login_attempts > self.login_attempts_allowed:
             # Lock the user's account
             request.user.is_active = False
             request.user.save()
             print("locked")
-            return Response({'error': 'Your account is locked. Please try again in {} minutes.'.format(self.login_attempt_timeout)},
-                            status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "error": "Your account is locked. Please try again in {} minutes.".format(
+                        self.login_attempt_timeout
+                    )
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         return super().create(request, *args, **kwargs)
+
+
+from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
+
+
+# class DataValidationMixin(APIView):
+#     print("DataValidationMixin")
+#     """
+#     Mixin class for validating data before saving it to the Stroke model.
+#     """
+
+#     def validate_data(self, request, data):
+#         print("validate_data")
+#         """
+#         Validate the data and raise a ValidationError if any of the required fields are missing.
+#         """
+#         required_fields = [
+#             "age",
+#             "glucose_level",
+#             "bmi",
+#             "blood_pressure_systolic",
+#             "blood_pressure_diastolic",
+#             # "user",
+#         ]
+#         for field in required_fields:
+#             if field not in data:
+#                 raise ValidationError(f"Field {field} is required")
+
+
+class DataValidationMixin(APIView):
+    print("DataValidationMixin")
+    """
+    Mixin class for validating data before saving it to the Stroke model.
+    """
+
+    def validate_data(self, request, data):
+        print("validate_data")
+        """
+        Validate the data and raise a ValidationError if any of the required fields are missing or if there are additional fields.
+        """
+        required_fields = [
+            "age",
+            "glucose_level",
+            "bmi",
+            "blood_pressure_systolic",
+            "blood_pressure_diastolic",
+            # "user",
+        ]
+        for field in required_fields:
+            if field not in data:
+                raise ValidationError(f"Field {field} is required")
+        additional_fields = set(list(data)) - set(required_fields)
+        if additional_fields:
+            raise ValidationError(
+                f"Additional field(s) {additional_fields} are not allowed"
+            )

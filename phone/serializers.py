@@ -114,10 +114,6 @@ class LoginSerializer(serializers.ModelSerializer):
         }
 
 
-
-
-
-
 class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
     password = serializers.CharField(
         write_only=True,
@@ -165,7 +161,7 @@ class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
 # from django.contrib.auth.hashers import make_password
 
 # class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
-   
+
 
 #     class Meta:
 #         model = User
@@ -178,3 +174,10 @@ class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
 #             password=make_password(validated_data['password'])
 #         )
 #         return user
+
+
+class StrokeDataUploadSerializer(serializers.Serializer):
+    stroke = serializers.FileField()
+
+    class Meta:
+        fields = ["stroke"]
