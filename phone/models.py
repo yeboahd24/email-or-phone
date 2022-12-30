@@ -7,6 +7,7 @@ from django.contrib.auth.models import (
 import binascii
 import os
 import uuid
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from django.conf import settings
 from django.db import models
@@ -146,3 +147,46 @@ class Notification(models.Model):
     title = models.CharField(max_length=200)
     body = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class Stroke(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="stroke")
+    glucose_level = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(5), MaxValueValidator(150)],
+        blank=True,
+        null=True,
+        verbose_name=_("Glucose level"),
+    )
+    bmi = models.FloatField(
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name=_("BMI"),
+        help_text=None,
+    )
+    blood_pressure_systolic = models.PositiveIntegerField(
+        validators=[MinValueValidator(70), MaxValueValidator(300)],
+        blank=True,
+        null=True,
+        verbose_name=_("Blood pressure systolic"),
+    )
+    blood_pressure_diastolic = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(10), MaxValueValidator(150)],
+        blank=True,
+        null=True,
+        verbose_name=_("Blood pressure diastolic"),
+    )
+    age = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(13), MaxValueValidator(110)],
+        blank=True,
+        null=True,
+        verbose_name=_("Age"),
+    )
+
+    def __str__(self):
+        return "Stroke({}) for user: {}".format(self.id, self.user)

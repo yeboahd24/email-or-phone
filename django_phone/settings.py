@@ -223,14 +223,14 @@ JWT_PERMANENT_TOKEN_AUTH = (True,)
 DEFAULT_FROM_EMAIL = "admin@gmail.com"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-SESSION_COOKIE_DOMAIN = "localhost"
-# set this to True in production
-SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_AGED = 1209600  # 2 weeks
-# PERSISTENT_SESSION_KEY = "persistent"
-SESSION_SAVE_EVERY_REQUEST = True
-SESSION_COOKIE_NAME = "sessionid"
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# SESSION_COOKIE_DOMAIN = "localhost"
+# # set this to True in production
+# SESSION_COOKIE_SECURE = False
+# SESSION_COOKIE_AGED = 1209600  # 2 weeks
+# # PERSISTENT_SESSION_KEY = "persistent"
+# SESSION_SAVE_EVERY_REQUEST = True
+# SESSION_COOKIE_NAME = "sessionid"
+# SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
 # Celery Configurations

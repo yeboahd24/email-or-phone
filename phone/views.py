@@ -368,6 +368,8 @@ from rest_framework import generics
 #             {"message": "Saved successfully"}, status=status.HTTP_201_CREATED
 #         )
 
+from .models import Stroke
+
 
 class FileUploadView(DataValidationMixin, generics.CreateAPIView):
     serializer_class = StrokeDataUploadSerializer
@@ -398,6 +400,29 @@ class FileUploadView(DataValidationMixin, generics.CreateAPIView):
                     reader = csv.DictReader(f)
                     contents = [x for x in reader]
                     self.validate_data(request, data=contents[0].keys())
+                    # print("contents", contents[0])
+                    # Create a new Stroke instance with the data in the row
+                    stroke = Stroke(
+                        user=request.user,
+                        glucose_level=contents[0]["glucose_level"],
+                        bmi=contents[0]["bmi"],
+                        blood_pressure_systolic=contents[0]["blood_pressure_systolic"],
+                        blood_pressure_diastolic=contents[0][
+                            "blood_pressure_diastolic"
+                        ],
+                        age=contents[0]["age"],
+                    )
+                    stroke.save()
+                    # stroke = Stroke(
+                    #     user=request.user,
+                    #     glucose_level=row["glucose_level"],
+                    #     bmi=row["bmi"],
+                    #     blood_pressure_systolic=row["blood_pressure_systolic"],
+                    #     blood_pressure_diastolic=row["blood_pressure_diastolic"],
+                    #     age=row["age"],
+                    # )
+                    # stroke.save()
+                    print("saving stroke data")
             if (
                 content_type
                 == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
