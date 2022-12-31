@@ -20,6 +20,7 @@ from .models import EmailPhoneUser, Device
 from .utils import *
 from .mixins import *
 from .parsers import *
+from .services import *
 from django.utils import timezone
 from django.contrib import messages
 from .models import Subscriber
@@ -394,35 +395,34 @@ class FileUploadView(DataValidationMixin, generics.CreateAPIView):
             )
         try:
             if content_type == "text/csv":
-                import csv
+                # import csv
 
-                with open(uploaded_file.name, "r", encoding="utf-8") as f:
-                    reader = csv.DictReader(f)
-                    contents = [x for x in reader]
-                    self.validate_data(request, data=contents[0].keys())
-                    # print("contents", contents[0])
-                    # Create a new Stroke instance with the data in the row
-                    stroke = Stroke(
-                        user=request.user,
-                        glucose_level=contents[0]["glucose_level"],
-                        bmi=contents[0]["bmi"],
-                        blood_pressure_systolic=contents[0]["blood_pressure_systolic"],
-                        blood_pressure_diastolic=contents[0][
-                            "blood_pressure_diastolic"
-                        ],
-                        age=contents[0]["age"],
-                    )
-                    stroke.save()
-                    # stroke = Stroke(
-                    #     user=request.user,
-                    #     glucose_level=row["glucose_level"],
-                    #     bmi=row["bmi"],
-                    #     blood_pressure_systolic=row["blood_pressure_systolic"],
-                    #     blood_pressure_diastolic=row["blood_pressure_diastolic"],
-                    #     age=row["age"],
-                    # )
-                    # stroke.save()
-                    print("saving stroke data")
+                # with open(uploaded_file.name, "r", encoding="utf-8") as f:
+                #     reader = csv.DictReader(f)
+                #     contents = [x for x in reader]
+                contents = read_csv_file(uploaded_file)
+                self.validate_data(request, data=contents[0].keys())
+                # print("contents", contents[0])
+                # Create a new Stroke instance with the data in the row
+                stroke = Stroke(
+                    user=request.user,
+                    glucose_level=contents[0]["glucose_level"],
+                    bmi=contents[0]["bmi"],
+                    blood_pressure_systolic=contents[0]["blood_pressure_systolic"],
+                    blood_pressure_diastolic=contents[0]["blood_pressure_diastolic"],
+                    age=contents[0]["age"],
+                )
+                stroke.save()
+                # stroke = Stroke(
+                #     user=request.user,
+                #     glucose_level=row["glucose_level"],
+                #     bmi=row["bmi"],
+                #     blood_pressure_systolic=row["blood_pressure_systolic"],
+                #     blood_pressure_diastolic=row["blood_pressure_diastolic"],
+                #     age=row["age"],
+                # )
+                # stroke.save()
+                print("saving stroke data")
             if (
                 content_type
                 == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

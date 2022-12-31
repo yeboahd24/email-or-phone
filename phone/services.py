@@ -13,6 +13,7 @@
 
 
 import grpc
+import csv
 from google.protobuf import empty_pb2
 from phone.serializers import UserProtoSerializer
 from django_grpc_framework.services import Service
@@ -47,3 +48,10 @@ class UserService(Service):
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details(str(serializer.errors))
             return empty_pb2.Empty()
+
+
+def read_csv_file(file):
+    with open(file.name, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        contents = [x for x in reader]
+    return contents
