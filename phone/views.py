@@ -30,6 +30,7 @@ from django.shortcuts import redirect
 from .mixins import DeviceMixin, LoginThrottlingMixin
 import requests
 from .forms import WordForm
+from django.core.files.storage import default_storage
 
 # Create your views here.
 
@@ -404,6 +405,12 @@ class FileUploadView(DataValidationMixin, generics.CreateAPIView):
                 self.validate_data(request, data=contents[0].keys())
                 # print("contents", contents[0])
                 # Create a new Stroke instance with the data in the row
+                # default_storage.save(
+                #     "users_uploaded_files/{0}/{1}".format(
+                #         request.user.username, file_name
+                #     )
+                # )
+
                 stroke = Stroke(
                     user=request.user,
                     glucose_level=contents[0]["glucose_level"],

@@ -50,8 +50,31 @@ class UserService(Service):
             return empty_pb2.Empty()
 
 
+from django.core.files.storage import default_storage
+
+# Get the file path of the uploaded file
+# def read_csv_file(file):
+#     file_path = default_storage.path(file.name)
+
+#     with open(file_path, "r", encoding="utf-8") as f:
+#         reader = csv.DictReader(f)
+#         contents = [x for x in reader]
+#     return contents
+
+
+import os
+
+
 def read_csv_file(file):
-    with open(file.name, "r", encoding="utf-8") as f:
+    # Save the uploaded file to a temporary directory
+    file_path = default_storage.save("temp/{0}".format(file.name), file)
+
+    # Open and read the file
+    with open(file_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         contents = [x for x in reader]
+
+    # Delete the temporary file
+    os.remove(file_path)
+
     return contents
