@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- profile.html -->
+<h1>{{ user.username }}'s Profile</h1>
+
+<h2>Recipes</h2>
+{% for recipe in recipes %}
+    <h3>{{ recipe.name }}</h3>
+{% endfor %}
+
+<h2>Comments</h2>
+{% for comment in comments %}
+    <h3>{{ comment.recipe.name }}</h3>
+    <p>{{ comment.content }}</p>
+{% endfor %}
+
+<h2>Ratings</h2>
+{% for rating in ratings %}
+    <h3>{{ rating.recipe.name }}</h3>
+    <p>{{ rating.rating }}</p>
+{% endfor %}
+
+{% endblock %}
+

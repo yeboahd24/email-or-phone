@@ -1,0 +1,59 @@
+<!-- recipe.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ recipe.name }}</h1>
+
+<h2>Ingredients</h2>
+<p>{{ recipe.ingredients }}</p>
+
+<h2>Instructions</h2>
+<p>{{ recipe.instructions }}</p>
+
+<h2>Follow</h2>
+{% if user.is_authenticated %}
+    {% if recipe.user in user.following.all %}
+        <form method="post" action="{% url 'follow' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="unfollow">
+            <input type="hidden" name="user_id" value="{{ recipe.user.id }}">
+            <button type="submit">Unfollow</button>
+        </form>
+    {% else %}
+        <form method="post" action="{% url 'follow' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="follow">
+            <input type="hidden" name="user_id" value="{{ recipe.user.id }}">
+            <button type="submit">Follow</button>
+        </form>
+    {% endif %}
+{% endif %}
+
+<h2>Comments</h2>
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'comment' %}">
+        {% csrf_token %}
+        <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
+        <textarea name="content"></textarea>
+        <button type="submit">Comment</button>
+    </form>
+{% endif %}
+{% for comment in recipe.comments.all %}
+    <h3>{{ comment.user }}</h3>
+    <p>{{ comment.content }}</p>
+{% endfor %}
+
+<h2>Ratings</h2>
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'rate' %}">
+        {% csrf_token %}
+        <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
+        <input type="number" name="rating" min="1" max="5">
+        <button type="submit">Rate</button>
+    </form> 
+{% endif %}
+{% for rating in recipe.ratings.all %}
+    <h3>{{ rating.user }}</h3>
+    <p>{{ rating.rating }}</p>
+{% endfor %}
+{% endblock %}
+

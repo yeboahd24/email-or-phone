@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<!-- customize.html -->
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+
+<!-- cookbook.html -->
+<style>
+    body {
+        background-color: #{{ cookbook.color_scheme }};
+    }
+</style>
+<img src="{{ cookbook.cover_image.url }}" alt="Cover image">
+
+<h1>{{ cookbook.user }}'s Cookbook</h1>
+
+{% for recipe in cookbook.recipes.all %}
+    <h2>{{ recipe.name }}</h2>
+    <p>{{ recipe.ingredients }}</p>
+{% endfor %}
+
+{% endblock %}
+

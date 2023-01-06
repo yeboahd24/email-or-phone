@@ -1,0 +1,20 @@
+{% extends "base.html" %}  
+{% block content %} 
+
+<form method="get" action="{% url 'recipe_list' %}">
+    <input type="text" name="q" placeholder="Search recipes" value="{{ q }}">
+    <button type="submit">Search</button>
+</form>
+
+ 
+{% for page_number in paginator.page_range %}
+    {% if page_number == recipes.number %}
+        <span class="font-bold">{{ page_number }}</span>
+    {% else %}
+        <a href="?page={{ page_number }}&q={{ q }}">{{ page_number }}</a>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}
+
+

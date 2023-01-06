@@ -20,6 +20,10 @@ from django.utils.translation import gettext_lazy as _
 from .managers import EmailPhoneUserManager
 from .common_fields import BaseModel
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 class Device(models.Model):
     """
@@ -190,3 +194,42 @@ class Stroke(models.Model):
 
     def __str__(self):
         return "Stroke({}) for user: {}".format(self.id, self.user)
+
+
+class Recipe(models.Model):
+    name = models.CharField(max_length=200)
+    ingredients = models.TextField()
+    instructions = models.TextField()
+    servings = models.PositiveIntegerField()
+    prep_time = models.DurationField()
+    cook_time = models.DurationField()
+    total_time = models.DurationField()
+    difficulty = models.PositiveSmallIntegerField()
+    followers = models.ManyToManyField(User, blank=True)
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    followers = models.ManyToManyField(User, related_name="following")
+    recipes = models.ManyToManyField(Recipe, blank=True)
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField()
+
+
+class Cookbook(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cover_image = models.ImageField()
+    color_scheme = models.CharField(max_length=6)
+    recipes = models.ManyToManyField(Recipe, blank=True)
+    

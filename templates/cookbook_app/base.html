@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <header class="bg-white p-4 shadow">
+        <h1 class="text-2xl font-bold">Cookbook</h1>
+    </header>
+    <main class="px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="bg-white p-4 shadow">
+        <p>Copyright 2021</p>
+    </footer>
+</body>
+
+</html>
