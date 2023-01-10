@@ -1,0 +1,10 @@
+<!-- index.html -->
+<html>
+  <head>
+    <script src="https://unpkg.com/htmx.org@1.8.4" integrity="sha384-wg5Y/JwF7VxGk4zLsJEcAojRtlVp1FKKdGy1qN+OMtdq72WRvX/EdRdqg/LOhYeV" crossorigin="anonymous"></script>
+</head>
+  <body>
+    <div hx-get="{% url 'time' %}" hx-interval="5000" hx-target="#time">Loading...</div>
+    <div id="time"></div>
+  </body>
+</html>

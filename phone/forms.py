@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import Recipe, Cookbook
+# from .models import Recipe, Cookbook
 
 
 User = get_user_model()
@@ -27,26 +27,26 @@ class WordForm(forms.Form):
     input = forms.CharField(label="Enter a sentence or paragraph:")
 
 
-class RecipeForm(forms.ModelForm):
-    class Meta:
-        model = Recipe
-        fields = [
-            "name",
-            "ingredients",
-            "instructions",
-            "servings",
-            "prep_time",
-            "cook_time",
-            "difficulty",
-        ]
-        widgets = {
-            "ingredients": forms.Textarea(attrs={"rows": 10}),
-            "instructions": forms.Textarea(attrs={"rows": 10}),
-        }
+# class RecipeForm(forms.ModelForm):
+#     class Meta:
+#         model = Recipe
+#         fields = [
+#             "name",
+#             "ingredients",
+#             "instructions",
+#             "servings",
+#             "prep_time",
+#             "cook_time",
+#             "difficulty",
+#         ]
+#         widgets = {
+#             "ingredients": forms.Textarea(attrs={"rows": 10}),
+#             "instructions": forms.Textarea(attrs={"rows": 10}),
+#         }
 
 
 
-class CookbookForm(forms.ModelForm):
-    class Meta:
-        model = Cookbook
-        fields = ['cover_image', 'color_scheme', 'recipes']
+# class CookbookForm(forms.ModelForm):
+#     class Meta:
+#         model = Cookbook
+#         fields = ['cover_image', 'color_scheme', 'recipes']
