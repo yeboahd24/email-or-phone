@@ -196,40 +196,50 @@ class Stroke(models.Model):
         return "Stroke({}) for user: {}".format(self.id, self.user)
 
 
-# class Recipe(models.Model):
-#     name = models.CharField(max_length=200)
-#     ingredients = models.TextField()
-#     instructions = models.TextField()
-#     servings = models.PositiveIntegerField()
-#     prep_time = models.DurationField()
-#     cook_time = models.DurationField()
-#     total_time = models.DurationField()
-#     difficulty = models.PositiveSmallIntegerField()
-#     followers = models.ManyToManyField(User, blank=True)
+from datetime import datetime
+from dateutil import rrule
 
 
-# class Profile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     followers = models.ManyToManyField(User, related_name="following")
-#     recipes = models.ManyToManyField(Recipe, blank=True)
+class Subscription(models.Model):
+    start_date = models.DateField()
+    end_date = models.DateField()
+    frequency = models.CharField(
+        max_length=10, choices=[("monthly", "Monthly"), ("yearly", "Yearly")]
+    )
+    next_delivery_date = models.DateField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    # user = models.ForeignKey(
+    #     EmailPhoneUser, on_delete=models.CASCADE, related_name="subscriptions"
+    # )
+
+    def __str__(self):
+        return f"Subscription {self.id}"
+
+    def delivery_dates(self):
+        if self.frequency == "monthly":
+            return list(
+                rrule.rrule(rrule.MONTHLY, dtstart=self.start_date, until=self.end_date)
+            )
+        elif self.frequency == "yearly":
+            return list(
+                rrule.rrule(rrule.YEARLY, dtstart=self.start_date, until=self.end_date)
+            )
+
+    def set_next_delivery_date(self):
+        if self.frequency == "monthly":
+            self.next_delivery_date = rrule.rrule(
+                rrule.MONTHLY, dtstart=self.start_date, until=self.end_date
+            ).after(datetime.now())
+        elif self.frequency == "yearly":
+            self.next_delivery_date = rrule.rrule(
+                rrule.YEARLY, dtstart=self.start_date, until=self.end_date
+            ).after(datetime.now())
 
 
-# class Comment(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-#     content = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
-# class Rating(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-#     rating = models.PositiveIntegerField()
-
-
-# class Cookbook(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     cover_image = models.ImageField()
-#     color_scheme = models.CharField(max_length=6)
-#     recipes = models.ManyToManyField(Recipe, blank=True)
-    
+@receiver(post_save, sender=Subscription)
+def set_next_delivery(sender, instance, **kwargs):
+    instance.set_next_delivery_date()

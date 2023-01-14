@@ -1,21 +1,24 @@
-<html>
-  <head>
-    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@1.8.4" integrity="sha384-wg5Y/JwF7VxGk4zLsJEcAojRtlVp1FKKdGy1qN+OMtdq72WRvX/EdRdqg/LOhYeV" crossorigin="anonymous"></script>
 
-  </head>
-  <body class="bg-gray-300 h-screen flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg p-6">
-      <h1 class="text-2xl font-bold mb-2">Time Counter</h1>
-      <div class="text-4xl font-bold mb-4" hx-get="/time" hx-target="#time">
-        Loading...
-      </div>
-      <button class="btn bg-blue-500 text-white font-bold py-2 px-4 rounded-full" hx-get="/start" hx-target="#time">
+<html lang="en">
+<head>
+  <script src="https://unpkg.com/htmx.org@1.8.4" integrity="sha384-wg5Y/JwF7VxGk4zLsJEcAojRtlVp1FKKdGy1qN+OMtdq72WRvX/EdRdqg/LOhYeV" crossorigin="anonymous"></script>
+
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-200">
+  <div class="container mx-auto py-16">
+    <div class="text-4xl text-center text-gray-800" id="counter">
+      {{ current_time|date:"H:i:s" }}
+    </div>
+    <div class="mx-auto py-4">
+      <button hx-get="/counter/" hx-swap="outerHTML" hx-target="#counter" class="btn btn-blue" id="start">
         Start
       </button>
-      <button class="btn bg-red-500 text-white font-bold py-2 px-4 rounded-full" hx-get="/reset" hx-target="#time">
-        Reset
+      <button hx-post="/stop/" hx-swap="outerHTML" hx-target="#counter" class="btn btn-red" id="stop">
+        Stop
       </button>
     </div>
-  </body>
+  </div>
+</body>
 </html>
+

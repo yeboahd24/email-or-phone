@@ -52,6 +52,8 @@ urlpatterns = [
     path("", get_definition, name="get_definition"),
     # path("not/", notifications, name="notifications"),
     path("", include("phone.urls")),
+    path('stopwatch/', stopwatch, name='stopwatch'),
+
 ]
 
 

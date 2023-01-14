@@ -453,216 +453,163 @@ class FileUploadView(DataValidationMixin, generics.CreateAPIView):
         )
 
 
-# from django.shortcuts import render
-# from .models import Recipe
-
-
-# def recipe_detail(request, recipe_id):
-#     recipe = Recipe.objects.get(pk=recipe_id)
-#     return render(request, "cookbook_app/recipe_detail.html", {"recipe": recipe})
-
-
-# from django.core.paginator import Paginator
-
-
-# def recipe_list(request):
-#     recipes = Recipe.objects.all()
-#     q = request.GET.get("q")
-#     if q:
-#         recipes = recipes.filter(name__contains=q)
-#     paginator = Paginator(recipes, 10)  # Show 10 recipes per page
-#     page = request.GET.get("page")
-#     recipes = paginator.get_page(page)
-
-#     return render(request, "cookbook_app/recipe_list.html", {"recipes": recipes})
-
-
-# import requests
-# from bs4 import BeautifulSoup
-
-
-# def import_recipe(request):
-#     if request.method == "POST":
-#         url = request.POST["url"]
-#         response = requests.get(url)
-#         soup = BeautifulSoup(response.text, "html.parser")
-#         name = soup.find("h1").text
-#         ingredients = soup.find("ul").text
-#         instructions = soup.find("ol").text
-#         recipe = Recipe(name=name, ingredients=ingredients, instructions=instructions)
-#         recipe.save()
-#         return redirect("recipe_detail", recipe_id=recipe.id)
-
-#     return render(request, "cookbook_app/import_recipe.html")
-
-
-# from django.contrib.auth import login, logout
-# from django.shortcuts import render, redirect
-# from django.contrib.auth.forms import AuthenticationForm
-# from django.contrib.auth.forms import UserCreationForm
-
-
-# def login_view(request):
-#     if request.method == "POST":
-#         form = AuthenticationForm(request, request.POST)
-#         if form.is_valid():
-#             user = form.get_user()
-#             login(request, user)
-#             return redirect("index")
-#     else:
-#         form = AuthenticationForm()
-#     return render(request, "cookbook_app/login.html", {"form": form})
-
-
-# def logout_view(request):
-#     logout(request)
-#     return redirect("index")
-
-
-# def signup(request):
-#     if request.method == "POST":
-#         form = UserCreationForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect("login")
-#     else:
-#         form = UserCreationForm()
-#     return render(request, "cookbook_app/signup.html", {"form": form})
-
-
-# def profile(request, username):
-#     user = User.objects.get(username=username)
-#     recipes = Recipe.objects.filter(user=user)
-#     comments = Comment.objects.filter(user=user)
-#     ratings = Rating.objects.filter(user=user)
-#     return render(
-#         request,
-#         "cookbook_app/profile.html",
-#         {
-#             "user": user,
-#             "recipes": recipes,
-#             "comments": comments,
-#             "ratings": ratings,
-#         },
-#     )
-
-
-# def following(request, username):
-#     user = User.objects.get(username=username)
-#     following = user.following.all()
-#     return render(request, "cookbook_app/following.html", {"following": following})
-
-
-# def followers(request, username):
-#     user = User.objects.get(username=username)
-#     followers = user.followers.all()
-#     return render(request, "cookbook_app/followers.html", {"followers": followers})
-
-
-# def follow(request):
-#     if request.method == "POST":
-#         action = request.POST["action"]
-#         user_id = request.POST["user_id"]
-#         user = User.objects.get(id=user_id)
-#         profile, created = Profile.objects.get_or_create(user=request.user)
-#         if action == "follow":
-#             profile.following.add(user)
-#         elif action == "unfollow":
-#             profile.following.remove(user)
-#         return redirect("profile", username=user.username)
-
-
-# def comment(request):
-#     if request.method == "POST":
-#         recipe_id = request.POST["recipe_id"]
-#         recipe = Recipe.objects.get(id=recipe_id)
-#         user = request.user
-#         content = request.POST["content"]
-#         Comment.objects.create(user=user, recipe=recipe, content=content)
-#         return redirect("recipe", id=recipe_id)
-
-
-# def recipe(request, id):
-#     recipe = Recipe.objects.get(id=id)
-#     context = {'recipe': recipe}
-#     return render(request, 'cookbook_app/recipe.html', context)
-
-# from  .models import Cookbook
-# def customize(request):
-#     try:
-#         cookbook = Cookbook.objects.get(user=request.user)
-#     except Cookbook.DoesNotExist:
-#         cookbook = Cookbook(user=request.user)
-#     if request.method == 'POST':
-#         form = CookbookForm(request.POST, request.FILES, instance=cookbook)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('cookbook')
-#     else:
-#         form = CookbookForm(instance=cookbook)
-#     context = {'form': form}
-#     return render(request, 'customize.html', context)
-
-
-
 # views.py
 from django.http import HttpResponse
 import datetime
 
+
 def time(request):
-  now = datetime.datetime.now()
-  return HttpResponse(now.strftime("%Y-%m-%d %H:%M:%S"))
-
-
-
-
-# from django.http import HttpResponse
-
-# time = 0
-
-# def time_view(request):
-#     global time
-#     return render(request, 'counter.html', {'time':time})
-
-# def start_view(request):
-#     global time
-#     time += 1
-#     return HttpResponse(time)
-
-# def reset_view(request):
-#     global time
-#     time = 0
-#     return HttpResponse(time)
-
+    now = datetime.datetime.now()
+    return HttpResponse(now.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 from django.shortcuts import render
 
 time = 0
 
+
 def time_view(request):
     global time
-    context = {'time': time}
-    return render(request, 'time.html', context)
+    context = {"time": time}
+    return render(request, "time.html", context)
+
 
 def start_view(request):
     global time
-    if request.method == 'POST':
+    if request.method == "POST":
         # process form data
         time += 1
-        context = {'time': time}
-        return render(request, 'time.html', context)
+        context = {"time": time}
+        return render(request, "time.html", context)
     else:
         # render the form template
-        return render(request, 'start.html')
+        return render(request, "start.html")
+
 
 def reset_view(request):
     global time
-    if request.method == 'POST':
+    if request.method == "POST":
         # process form data
         time = 0
-        context = {'time': time}
-        return render(request, 'time.html', context)
+        context = {"time": time}
+        return render(request, "time.html", context)
     else:
         # render the form template
-        return render(request, 'reset.html')
+        return render(request, "reset.html")
+
+
+from django.shortcuts import render
+import datetime
+from django.views.decorators.csrf import csrf_exempt
+
+
+def counter(request):
+    current_time = datetime.datetime.now()
+    return render(request, "counter.html", {"current_time": current_time})
+
+
+@csrf_exempt
+def stop(request):
+    return render(request, "counter.html", {"current_time": None})
+
+
+# @csrf_exempt
+# def stopwatch(request):
+#     elapsed_time = 0  # replace this with the elapsed time from the database
+#     return render(request, 'stopwatch.html', {'elapsed_time': elapsed_time})
+
+
+import random
+
+
+@csrf_exempt
+def stopwatch(request):
+    elapsed_time = 0  # replace this with the elapsed time from the database
+    # Select a random picture from a list of picture URLs
+    picture_urls = [
+        "https://picsum.photos/200/300",
+        "https://picsum.photos/200/301",
+        "https://picsum.photos/200/302",
+        "https://picsum.photos/200/303",
+    ]
+    random_picture_url = random.choice(picture_urls)
+    return render(
+        request,
+        "stopwatch.html",
+        {"elapsed_time": elapsed_time, "random_picture_url": random_picture_url},
+    )
+
+
+from .serializers import SubscriptionSerializer
+from .models import Subscription
+
+
+class CreateSubscriptionView(generics.CreateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+
+
+from django.http import JsonResponse
+
+
+class PaymentWebhookView(View):
+    def post(self, request):
+        # Extract the payment information from the request
+        payment_info = request.POST.get("payment_info")
+
+        # Use the payment information to create or update a subscription
+        subscription = process_payment(payment_info)
+
+        return JsonResponse({"status": "success"})
+
+
+def process_payment(payment_info):
+    # Extract necessary information from the payment_info
+    subscription_id = payment_info["subscription_id"]
+    amount = payment_info["amount"]
+    start_date = payment_info["start_date"]
+    end_date = payment_info["end_date"]
+    frequency = payment_info["frequency"]
+    next_delivery_date = payment_info["next_delivery_date"]
+
+    try:
+        # check if a subscription with the given id already exists
+        subscription = Subscription.objects.get(id=subscription_id)
+        # Update the subscription based on the payment information
+        subscription.amount = amount
+        subscription.status = status
+        subscription.save()
+        return subscription
+    except Subscription.DoesNotExist:
+        # Create a new subscription
+        subscription = Subscription.objects.create(
+            id=subscription_id,
+            amount=amount,
+            start_date=start_date,
+            end_date=end_date,
+            frequency=frequency,
+            next_delivery_date=next_delivery_date,
+        )
+        return subscription
+
+
+import stripe
+
+
+def notify_payment_system(subscription):
+    # Update the subscription on the payment system
+    stripe.Subscription.modify(
+        subscription.id,
+        trial_end=subscription.next_delivery_date.timestamp(),
+        billing_cycle_anchor=subscription.next_delivery_date.timestamp(),
+    )
+
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+@receiver(post_save, sender=Subscription)
+def notify_subscription_update(sender, instance, **kwargs):
+    # Notify the payment system that the subscription has been updated
+    notify_payment_system(instance)

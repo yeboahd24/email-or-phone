@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext as _
 from django.contrib.auth import authenticate
 from django.contrib.auth import password_validation as validators
-from .models import Device
+from .models import Device, Subscription
 from .utils import *
 from django.utils import timezone
 from django_grpc_framework import generics, proto_serializers
@@ -181,3 +181,9 @@ class StrokeDataUploadSerializer(serializers.Serializer):
 
     class Meta:
         fields = ["stroke"]
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = "__all__"
