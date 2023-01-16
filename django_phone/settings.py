@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     # "trench",
     "django_grpc_framework",
     "channels",
+    'django_private_chat2.apps.DjangoPrivateChat2Config',
+
 ]
 
 MIDDLEWARE = [

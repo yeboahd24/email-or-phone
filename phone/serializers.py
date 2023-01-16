@@ -187,3 +187,14 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = "__all__"
+
+
+# New Flow
+
+
+class UserSignUP(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = [
+            "username",
+        ]

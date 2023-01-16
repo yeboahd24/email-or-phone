@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from rest_framework.views import APIView, View
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken, format_lazy
@@ -593,23 +593,79 @@ def process_payment(payment_info):
         return subscription
 
 
-import stripe
+# import stripe
 
 
-def notify_payment_system(subscription):
-    # Update the subscription on the payment system
-    stripe.Subscription.modify(
-        subscription.id,
-        trial_end=subscription.next_delivery_date.timestamp(),
-        billing_cycle_anchor=subscription.next_delivery_date.timestamp(),
-    )
+# def notify_payment_system(subscription):
+#     # Update the subscription on the payment system
+#     stripe.Subscription.modify(
+#         subscription.id,
+#         trial_end=subscription.next_delivery_date.timestamp(),
+#         billing_cycle_anchor=subscription.next_delivery_date.timestamp(),
+#     )
 
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
-@receiver(post_save, sender=Subscription)
-def notify_subscription_update(sender, instance, **kwargs):
-    # Notify the payment system that the subscription has been updated
-    notify_payment_system(instance)
+# @receiver(post_save, sender=Subscription)
+# def notify_subscription_update(sender, instance, **kwargs):
+#     # Notify the payment system that the subscription has been updated
+#     notify_payment_system(instance)
+
+
+# views.py
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
+from django.views import View
+from rest_framework.response import Response
+
+
+class SignupView(View):
+    def post(self, request):
+        username = request.data.get("username")
+        try:
+            validate_email(email)
+            # create user with email
+            user = User.objects.create(username=username)
+            # user.email = email
+            user.is_active = False
+            # generate OTP and send it to user's email
+            user.otp = get_random_string(length=6)
+            send_mail(
+                "OTP for signup",
+                f"Your OTP is {user.otp}",
+                "from@example.com",
+                [user.username],
+                fail_silently=False,
+            )
+            user.save()
+            return Response({"message": "OTP sent to email"})
+        except ValidationError:
+            return Response({"message": "Invalid email"}, status=400)
+
+
+class VerifyOTPView(View):
+    def post(self, request):
+        otp = request.data.get("otp")
+        try:
+            user = User.objects.get(otp=otp)
+            user.is_active = True
+            user.save()
+            return Response({"message": "OTP verified"})
+        except User.DoesNotExist:
+            return Response({"message": "Invalid OTP"}, status=400)
+
+
+class CompleteSignupView(View):
+    def put(self, request):
+        password = request.data.get("password")
+        full_name = request.data.get("full_name")
+        user = request.user
+        user.set_password(password)
+        user.full_name = full_name
+        user.save()
+        return Response({"message": "Signup completed"})

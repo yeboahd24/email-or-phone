@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from phone.views import *
 from phone.handlers import grpc_handlers as user_grpc_handlers
 
@@ -49,10 +49,12 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("subscribe/", subscribe, name="subscribe"),
     path("unsubscribe/", unsubscribe, name="unsubscribe"),
-    path("", get_definition, name="get_definition"),
+    path("define/", get_definition, name="get_definition"),
     # path("not/", notifications, name="notifications"),
-    path("", include("phone.urls")),
+    path("not", include("phone.urls")),
     path('stopwatch/', stopwatch, name='stopwatch'),
+    path('', include('django_private_chat2.urls', namespace='django_private_chat2')),
+
 
 ]
 
