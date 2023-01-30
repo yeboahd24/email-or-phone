@@ -101,6 +101,7 @@ class AbstractEmailPhoneUser(AbstractBaseUser, PermissionsMixin):
         Device, on_delete=models.CASCADE, related_name="device", null=True
     )
     date_locked = models.DateTimeField(null=True, blank=True)
+    otp = models.CharField(max_length=255, null=True, blank=True)
 
     objects = EmailPhoneUserManager()
 
@@ -243,3 +244,9 @@ from django.dispatch import receiver
 @receiver(post_save, sender=Subscription)
 def set_next_delivery(sender, instance, **kwargs):
     instance.set_next_delivery_date()
+
+
+class MagicLink(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    link = models.CharField(max_length=255)
+    expires_at = models.DateTimeField(auto_now_add=True)

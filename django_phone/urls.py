@@ -51,11 +51,9 @@ urlpatterns = [
     path("unsubscribe/", unsubscribe, name="unsubscribe"),
     path("define/", get_definition, name="get_definition"),
     # path("not/", notifications, name="notifications"),
-    path("not", include("phone.urls")),
-    path('stopwatch/', stopwatch, name='stopwatch'),
-    path('', include('django_private_chat2.urls', namespace='django_private_chat2')),
-
-
+    path("", include("phone.urls")),
+    path("stopwatch/", stopwatch, name="stopwatch"),
+    path("", include("django_private_chat2.urls", namespace="django_private_chat2")),
 ]
 
 

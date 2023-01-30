@@ -49,8 +49,8 @@ INSTALLED_APPS = [
     # "trench",
     "django_grpc_framework",
     "channels",
-    'django_private_chat2.apps.DjangoPrivateChat2Config',
-
+    "django_private_chat2.apps.DjangoPrivateChat2Config",
+    "crispy_forms",
 ]
 
 MIDDLEWARE = [
@@ -257,3 +257,4 @@ CELERY_BEAT_SCHEDULE = {
 
 
 DICTIONARY_KEY = "15b1025e-5041-4d7b-9f7b-4f74bd0deabe"
+CRISPY_TEMPLATE_PACK = "bootstrap4"

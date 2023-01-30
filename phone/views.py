@@ -35,6 +35,17 @@ from django.core.files.storage import default_storage
 # Create your views here.
 
 
+# Magic Link
+from django.conf import settings
+import jwt
+from django.core.mail import send_mail
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from .forms import SignUpForm
+from django.urls import reverse
+
+
 class UsersListView(ListAPIView):
     permission_classes = [
         AllowAny,
@@ -593,79 +604,35 @@ def process_payment(payment_info):
         return subscription
 
 
-# import stripe
 
 
-# def notify_payment_system(subscription):
-#     # Update the subscription on the payment system
-#     stripe.Subscription.modify(
-#         subscription.id,
-#         trial_end=subscription.next_delivery_date.timestamp(),
-#         billing_cycle_anchor=subscription.next_delivery_date.timestamp(),
-#     )
+from django.shortcuts import render
+import requests
 
+def search_movie(request):
+    if request.method == 'POST':
+        movie_title = request.POST['movie_title']
+        api = "6e907d6d"
+        url = f'http://www.omdbapi.com/?apikey={api}&t={movie_title}'
+        response = requests.get(url)
+        data = response.json()
+        title = data['Title']
+        year = data['Year']
+        rating = data['Ratings'][0]['Value']
+        release_date = data['Released']
+        language = data['Language']
+        poster = data['Poster']
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+        movie = {
+            'Title': title,
+            'Year': year,
+            'Rating': rating,
+            'Released': release_date,
+            'Language': language,
+            'Poster': poster
 
-
-# @receiver(post_save, sender=Subscription)
-# def notify_subscription_update(sender, instance, **kwargs):
-#     # Notify the payment system that the subscription has been updated
-#     notify_payment_system(instance)
-
-
-# views.py
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
-from django.utils.crypto import get_random_string
-from django.views import View
-from rest_framework.response import Response
-
-
-class SignupView(View):
-    def post(self, request):
-        username = request.data.get("username")
-        try:
-            validate_email(email)
-            # create user with email
-            user = User.objects.create(username=username)
-            # user.email = email
-            user.is_active = False
-            # generate OTP and send it to user's email
-            user.otp = get_random_string(length=6)
-            send_mail(
-                "OTP for signup",
-                f"Your OTP is {user.otp}",
-                "from@example.com",
-                [user.username],
-                fail_silently=False,
-            )
-            user.save()
-            return Response({"message": "OTP sent to email"})
-        except ValidationError:
-            return Response({"message": "Invalid email"}, status=400)
-
-
-class VerifyOTPView(View):
-    def post(self, request):
-        otp = request.data.get("otp")
-        try:
-            user = User.objects.get(otp=otp)
-            user.is_active = True
-            user.save()
-            return Response({"message": "OTP verified"})
-        except User.DoesNotExist:
-            return Response({"message": "Invalid OTP"}, status=400)
-
-
-class CompleteSignupView(View):
-    def put(self, request):
-        password = request.data.get("password")
-        full_name = request.data.get("full_name")
-        user = request.user
-        user.set_password(password)
-        user.full_name = full_name
-        user.save()
-        return Response({"message": "Signup completed"})
+        }
+        print(movie)
+        return render(request, 'start.html',  {'movies': movie})
+    else:
+        return render(request, 'start.html')

@@ -20,4 +20,5 @@ urlpatterns = [
         "subscriptions/", CreateSubscriptionView.as_view(), name="create-subscription"
     ),
     path("webhooks/payment/", PaymentWebhookView.as_view(), name="payment-webhook"),
+    path("search/", search_movie, name="search_movie"),
 ]

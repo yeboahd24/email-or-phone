@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+
 # from .models import Recipe, Cookbook
 
 
@@ -45,8 +46,66 @@ class WordForm(forms.Form):
 #         }
 
 
-
 # class CookbookForm(forms.ModelForm):
 #     class Meta:
 #         model = Cookbook
 #         fields = ['cover_image', 'color_scheme', 'recipes']
+
+
+class SignUpForm(forms.ModelForm):
+
+    username = forms.CharField(max_length=30, required=True, label="Email")
+    # first_name = forms.CharField(max_length=30, required=False)
+    # last_name = forms.CharField(max_length=30, required=False)
+    # email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    # password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+
+    class Meta:
+        model = User
+        fields = ("username", "password")
+
+    # def clean_password2(self):
+    #     cd = self.cleaned_data
+    #     if cd["password"] != cd["password2"]:
+    #         raise forms.ValidationError("Passwords don't match.")
+    #     return cd["password2"]
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        try:
+            User.objects.get(username=username)
+        except User.DoesNotExist:
+            return username
+        raise forms.ValidationError('Username "%s" is already in use.' % username)
+
+    # def clean_email(self):
+    #     email = self.cleaned_data['email']
+    #     try:
+    #         User.objects.get(email=email)
+    #     except User.DoesNotExist:
+    #         return email
+    #     raise forms.ValidationError('Email "%s" is already in use.' % email)
+
+    def save(self, commit=True):
+        user = super(SignUpForm, self).save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
+
+
+class LoginForm2(forms.Form):
+    username = forms.CharField()
+
+    class Meta:
+        model = User
+        fields = ("username",)
+
+    def clean(self):
+        try:
+            user = User.objects.get(username__iexact=self.cleaned_data["username"])
+        except User.DoesNotExist:
+            raise forms.ValidationError("Invalid username, please try again.")
+
+        return self.cleaned_data
