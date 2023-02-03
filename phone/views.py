@@ -636,3 +636,27 @@ def search_movie(request):
         return render(request, 'start.html',  {'movies': movie})
     else:
         return render(request, 'start.html')
+
+
+
+
+# views.py
+from django.shortcuts import render
+from .forms import Page1Form, Page2Form, Page3Form
+
+def forms(request):
+  if request.method == 'POST':
+    if 'page1' in request.POST:
+      form = Page2Form()
+      return render(request, 'page2.html', {'form': form})
+    elif 'page2' in request.POST:
+      form = Page3Form()
+      return render(request, 'page3.html', {'form': form})
+    else:
+      # save the form data
+      # ...
+      return render(request, 'completed.html')
+  else:
+    form = Page1Form()
+  return render(request, 'forms.html', {'form': form})
+

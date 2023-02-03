@@ -109,3 +109,23 @@ class LoginForm2(forms.Form):
             raise forms.ValidationError("Invalid username, please try again.")
 
         return self.cleaned_data
+
+
+
+# forms.py
+
+class Page1Form(forms.Form):
+    email = forms.EmailField()
+    full_name = forms.CharField(max_length=100)
+
+class Page2Form(forms.Form):
+    country = forms.CharField(max_length=100)
+    phone_number = forms.CharField(max_length=20)
+
+class Page3Form(forms.Form):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
+    gender = forms.ChoiceField(choices=GENDER_CHOICES)
+    occupation = forms.CharField(max_length=100)

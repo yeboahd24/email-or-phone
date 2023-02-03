@@ -21,4 +21,6 @@ urlpatterns = [
     ),
     path("webhooks/payment/", PaymentWebhookView.as_view(), name="payment-webhook"),
     path("search/", search_movie, name="search_movie"),
+    path('forms/', forms, name='forms'),
+
 ]

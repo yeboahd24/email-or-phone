@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/tailwindcss@^2.0/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="container mx-auto">
+      <div class="flex justify-center">
+        <div class="w-1/2">
+          <div class="flex justify-center">
+            <div class="w-1/2">
+              <!-- page3.html -->
+              <div id="page3" style="display: none" class="mb-5">
+                <div class="mb-5">
+                  <label
+                    class="block text-gray-700 font-medium mb-2"
+                    for="{{ form.gender.id_for_label }}"
+                  >
+                    Gender
+                  </label>
+                  {{ form.gender }}
+                </div>
+                <div class="mb-5">
+                  <label
+                    class="block text-gray-700 font-medium mb-2"
+                    for="{{ form.occupation.id_for_label }}"
+                  >
+                    Occupation
+                  </label>
+                  {{ form.occupation }}
+                </div>
+                <input
+                  type="submit"
+                  value="Save"
+                  class="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
