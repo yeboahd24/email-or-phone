@@ -660,3 +660,44 @@ def forms(request):
     form = Page1Form()
   return render(request, 'forms.html', {'form': form})
 
+from .forms import MoveForm
+
+def make_move(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    board = [list(row) for row in game.board.split('-')]
+    player = game.next_player
+    form = MoveForm(request.POST or None, board=board)
+    if form.is_valid():
+        row = form.cleaned_data['row']
+        col = form.cleaned_data['col']
+        board[row][col] = player.symbol
+        game.board = '-'.join(''.join(row) for row in board)
+        game.next_player = game.other_player
+        if game.is_finished():
+            game.winner = player
+            game.finished = True
+        game.save()
+        return redirect('game_detail', game_id=game.id)
+    return render(request, 'game_detail.html', {'game': game, 'form': form})
+
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Game, Player
+
+def game_detail(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    return render(request, 'game_detail.html', {'game': game})
+
+
+def game_list(request):
+    games = Game.objects.all()
+    return render(request, 'game_list.html', {'games': games})
+
+def player_detail(request, player_id):
+    player = get_object_or_404(Player, pk=player_id)
+    return render(request, 'player_detail.html', {'player': player})
+
+def player_list(request):
+    players = Player.objects.all()
+    return render(request, 'player_list.html', {'players': players})

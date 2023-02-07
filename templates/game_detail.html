@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  <title>Game {{ game.id }}</title>
+</head>
+<body class="bg-gray-200">
+  <div class="w-1/2 mx-auto py-10">
+    <h1 class="text-2xl font-medium text-center">Game {{ game.id }}</h1>
+    <table class="table-auto">
+        {% for row in board %}
+          <tr>
+            {% for value in row %}
+              <td id="cell-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}" class="border p-4 text-center">{{ value|default:'' }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </table>
+      
+    {% if game.winner %}
+      <p class="mt-4 text-lg font-medium">Winner: {{ game.winner.username }}</p>
+    {% endif %}
+    <form action="{% url 'make_move' game.id %}" method="post" class="mt-10">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Make move" class="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+    </form>
+  </div>
+
+  <script>
+// Game state variables
+var board = [];
+var currentPlayer = "X";
+
+// Function to make a move on the board
+function makeMove(row, col) {
+  board[row][col] = currentPlayer;
+  updateBoardDisplay();
+  if (checkForWin(currentPlayer)) {
+    alert("Player " + currentPlayer + " wins!");
+  } else if (checkForDraw()) {
+    alert("Draw!");
+  } else {
+    switchPlayer();
+  }
+}
+
+// Function to switch the current player
+function switchPlayer() {
+  currentPlayer = (currentPlayer == "X") ? "O" : "X";
+}
+
+// Function to check for a win
+function checkForWin(player) {
+  // Check rows
+  for (var i = 0; i < 3; i++) {
+    if (board[i][0] == player && board[i][1] == player && board[i][2] == player) {
+      return true;
+    }
+  }
+
+  // Check columns
+  for (var i = 0; i < 3; i++) {
+    if (board[0][i] == player && board[1][i] == player && board[2][i] == player) {
+      return true;
+    }
+  }
+
+  // Check diagonals
+  if (board[0][0] == player && board[1][1] == player && board[2][2] == player) {
+    return true;
+  }
+  if (board[0][2] == player && board[1][1] == player && board[2][0] == player) {
+    return true;
+  }
+
+  return false;
+}
+
+// Function to check for a draw
+function checkForDraw() {
+  for (var i = 0; i < 3; i++) {
+    for (var j = 0; j < 3; j++) {
+      if (board[i][j] == null) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// Function to update the display of the board
+function updateBoardDisplay() {
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        var id = "cell-" + i + "-" + j;
+        var cell = document.getElementById(id);
+        cell.innerHTML = board[i][j] || "";
+      }
+    }
+  }
+  
+
+</script>
+
+</body>
+</html>

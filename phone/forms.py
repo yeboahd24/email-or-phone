@@ -129,3 +129,25 @@ class Page3Form(forms.Form):
     ]
     gender = forms.ChoiceField(choices=GENDER_CHOICES)
     occupation = forms.CharField(max_length=100)
+
+
+
+class MoveForm(forms.Form):
+    row = forms.IntegerField()
+    col = forms.IntegerField()
+
+    def __init__(self, *args, **kwargs):
+        board = kwargs.pop('board')
+        super().__init__(*args, **kwargs)
+        self.board = board
+
+    def clean(self):
+        cleaned_data = super().clean()
+        row = cleaned_data.get('row')
+        col = cleaned_data.get('col')
+
+        if row is not None and col is not None:
+            if not (0 <= row < 3 and 0 <= col < 3):
+                raise forms.ValidationError("Invalid move")
+            if self.board[row][col] is not None:
+                raise forms.ValidationError("Cell already occupied")

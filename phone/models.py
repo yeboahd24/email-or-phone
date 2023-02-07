@@ -250,3 +250,51 @@ class MagicLink(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     link = models.CharField(max_length=255)
     expires_at = models.DateTimeField(auto_now_add=True)
+
+
+class Player(models.Model):
+    name = models.CharField(max_length=100)
+    symbol = models.CharField(max_length=1)
+    games_played = models.PositiveIntegerField(default=0)
+    games_won = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+
+class Game(models.Model):
+    board = models.CharField(max_length=9, default='-'*9)
+    winner = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Game {self.id}"
+
+    def next_player(self):
+        x_count = self.board.count('X')
+        o_count = self.board.count('O')
+        if x_count <= o_count:
+            return Player.objects.get(symbol='X')
+        else:
+            return Player.objects.get(symbol='O')
+
+    def is_finished(self):
+        board = self.board
+        if board[0] == board[1] == board[2] and board[0] != ' ':
+            return True
+        elif board[3] == board[4] == board[5] and board[3] != ' ':
+            return True
+        elif board[6] == board[7] == board[8] and board[6] != ' ':
+            return True
+        elif board[0] == board[3] == board[6] and board[0] != ' ':
+            return True
+        elif board[1] == board[4] == board[7] and board[1] != ' ':
+            return True
+        elif board[2] == board[5] == board[8] and board[2] != ' ':
+            return True
+        elif board[0] == board[4] == board[8] and board[0] != ' ':
+            return True
+        elif board[2] == board[4] == board[6] and board[2] != ' ':
+            return True
+        else:
+            return False
