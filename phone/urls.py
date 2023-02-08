@@ -21,11 +21,16 @@ urlpatterns = [
     ),
     path("webhooks/payment/", PaymentWebhookView.as_view(), name="payment-webhook"),
     path("search/", search_movie, name="search_movie"),
-    path('forms/', forms, name='forms'),
-    path('game/<int:game_id>/', game_detail, name='game_detail'),
-    path('game/<int:game_id>/move/', make_move, name='make_move'),
-    path('games/', game_list, name='game_list'),
+    path("forms/", forms, name="forms"),
+    path("game/<int:game_id>/", game_detail, name="game_detail"),
+    path("game/<int:game_id>/move/", make_move, name="make_move"),
+    path("games/", game_list, name="game_list"),
+    path("password-reset/", PasswordResetView.as_view(), name="password_reset"),
+    path(
+        "password-reset-confirm/<str:uidb64>/<str:token>/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
     # path('players/int:player_id/', player_detail, name='player_detail'),
     # path('players/',player_list, name='player_list'),
-
 ]

@@ -198,3 +198,25 @@ class UserSignUP(serializers.ModelSerializer):
         fields = [
             "username",
         ]
+
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    # password input field
+    new_password = serializers.CharField(
+        style={"input_type": "password"}, write_only=True
+    )
+
+    # make the new password field required
+    def validate_new_password(self, value):
+        if not value:
+            raise serializers.ValidationError("This field is required.")
+        return value
+
+

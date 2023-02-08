@@ -604,100 +604,158 @@ def process_payment(payment_info):
         return subscription
 
 
-
-
 from django.shortcuts import render
 import requests
 
+
 def search_movie(request):
-    if request.method == 'POST':
-        movie_title = request.POST['movie_title']
+    if request.method == "POST":
+        movie_title = request.POST["movie_title"]
         api = "6e907d6d"
-        url = f'http://www.omdbapi.com/?apikey={api}&t={movie_title}'
+        url = f"http://www.omdbapi.com/?apikey={api}&t={movie_title}"
         response = requests.get(url)
         data = response.json()
-        title = data['Title']
-        year = data['Year']
-        rating = data['Ratings'][0]['Value']
-        release_date = data['Released']
-        language = data['Language']
-        poster = data['Poster']
+        title = data["Title"]
+        year = data["Year"]
+        rating = data["Ratings"][0]["Value"]
+        release_date = data["Released"]
+        language = data["Language"]
+        poster = data["Poster"]
 
         movie = {
-            'Title': title,
-            'Year': year,
-            'Rating': rating,
-            'Released': release_date,
-            'Language': language,
-            'Poster': poster
-
+            "Title": title,
+            "Year": year,
+            "Rating": rating,
+            "Released": release_date,
+            "Language": language,
+            "Poster": poster,
         }
         print(movie)
-        return render(request, 'start.html',  {'movies': movie})
+        return render(request, "start.html", {"movies": movie})
     else:
-        return render(request, 'start.html')
-
-
+        return render(request, "start.html")
 
 
 # views.py
 from django.shortcuts import render
 from .forms import Page1Form, Page2Form, Page3Form
 
+
 def forms(request):
-  if request.method == 'POST':
-    if 'page1' in request.POST:
-      form = Page2Form()
-      return render(request, 'page2.html', {'form': form})
-    elif 'page2' in request.POST:
-      form = Page3Form()
-      return render(request, 'page3.html', {'form': form})
+    if request.method == "POST":
+        if "page1" in request.POST:
+            form = Page2Form()
+            return render(request, "page2.html", {"form": form})
+        elif "page2" in request.POST:
+            form = Page3Form()
+            return render(request, "page3.html", {"form": form})
+        else:
+            # save the form data
+            # ...
+            return render(request, "completed.html")
     else:
-      # save the form data
-      # ...
-      return render(request, 'completed.html')
-  else:
-    form = Page1Form()
-  return render(request, 'forms.html', {'form': form})
+        form = Page1Form()
+    return render(request, "forms.html", {"form": form})
+
 
 from .forms import MoveForm
 
+
 def make_move(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
-    board = [list(row) for row in game.board.split('-')]
+    board = [list(row) for row in game.board.split("-")]
     player = game.next_player
     form = MoveForm(request.POST or None, board=board)
     if form.is_valid():
-        row = form.cleaned_data['row']
-        col = form.cleaned_data['col']
+        row = form.cleaned_data["row"]
+        col = form.cleaned_data["col"]
         board[row][col] = player.symbol
-        game.board = '-'.join(''.join(row) for row in board)
+        game.board = "-".join("".join(row) for row in board)
         game.next_player = game.other_player
         if game.is_finished():
             game.winner = player
             game.finished = True
         game.save()
-        return redirect('game_detail', game_id=game.id)
-    return render(request, 'game_detail.html', {'game': game, 'form': form})
-
+        return redirect("game_detail", game_id=game.id)
+    return render(request, "game_detail.html", {"game": game, "form": form})
 
 
 from django.shortcuts import render, get_object_or_404
 from .models import Game, Player
 
+
 def game_detail(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
-    return render(request, 'game_detail.html', {'game': game})
+    return render(request, "game_detail.html", {"game": game})
 
 
 def game_list(request):
     games = Game.objects.all()
-    return render(request, 'game_list.html', {'games': games})
+    return render(request, "game_list.html", {"games": games})
+
 
 def player_detail(request, player_id):
     player = get_object_or_404(Player, pk=player_id)
-    return render(request, 'player_detail.html', {'player': player})
+    return render(request, "player_detail.html", {"player": player})
+
 
 def player_list(request):
     players = Player.objects.all()
-    return render(request, 'player_list.html', {'players': players})
+    return render(request, "player_list.html", {"players": players})
+
+
+from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.core.mail import send_mail
+
+from .serializers import PasswordResetSerializer, PasswordResetConfirmSerializer
+
+
+class PasswordResetView(GenericAPIView):
+    serializer_class = PasswordResetSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        user = get_user_model().objects.get(email=email)
+        current_site = get_current_site(request)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        password_reset_url = f"{current_site}/password-reset-confirm/{uid}/{token}"
+        email_subject = "Password Reset Request"
+        email_body = (
+            f"Please follow the link to reset your password: {password_reset_url}"
+        )
+        send_mail(
+            email_subject, email_body, "from@example.com", [email], fail_silently=False
+        )
+        return Response({"email": email}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+
+    def post(self, request, uidb64, token, *args, **kwargs):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = get_user_model().objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user.set_password(serializer.validated_data["new_password"])
+            user.save()
+            return Response(
+                {"status": "password reset successful"}, status=status.HTTP_200_OK
+            )
+        return Response(
+            {"status": "password reset failed"}, status=status.HTTP_400_BAD_REQUEST
+        )
