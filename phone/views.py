@@ -759,3 +759,25 @@ class PasswordResetConfirmView(GenericAPIView):
         return Response(
             {"status": "password reset failed"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+from django.http import JsonResponse
+from .models import DataPoint
+
+def get_data(request):
+    data = list(DataPoint.objects.values('value', 'created_at'))
+    return JsonResponse({'data': data})
+    # return render(request, 'chart.html', {'data': data})
+
+from django.shortcuts import render
+
+def chart_view(request):
+    return render(request, 'chart.html')
+
+
+@csrf_exempt
+def add_data(request):
+    if request.method == 'POST':
+        value = request.POST.get('value')
+        DataPoint.objects.create(value=value)
+        return JsonResponse({'status': 'success'})

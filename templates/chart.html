@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Live Update Chart</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-200">
+    <h1 class="text-xl font-bold text-center py-4">Live Update Chart</h1>
+    <div class="w-64 mx-auto">
+        <canvas id="myChart" width="900" height="900"></canvas>
+    </div>
+
+    <form id="add-data-form" class="bg-white p-6 rounded-lg shadow-md" method="POST">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2" for="value">
+                Value:
+            </label>
+            <input 
+                class="w-full border border-gray-400 p-2 rounded-lg" 
+                id="value" 
+                name="value" 
+                type="text"
+            >
+        </div>
+        <button 
+            class="bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600"
+            type="submit"
+        >
+            Add Data
+        </button>
+    </form>
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script>
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: [],
+              datasets: [{
+                  label: 'Data',
+                  data: [],
+                  backgroundColor: 'rgba(54,162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero: true
+                      }
+                  }]
+              }
+          }
+      });
+
+      function updateChart() {
+          $.ajax({
+              url: '/get_data/',
+              type: 'GET',
+              dataType: 'json',
+              success: function(data) {
+                  chart.data.labels = data.data.map(function(datapoint) {
+                      return datapoint.created_at;
+                  });
+                  chart.data.datasets[0].data = data.data.map(function(datapoint) {
+                      return datapoint.value;
+                  });
+                  chart.update();
+              }
+          });
+      }
+
+      setInterval(updateChart, 1000);
+
+        $(document).ready(function() {
+            $('#add-data-form').submit(function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/add_data/',
+                    type: 'POST',
+                    data: {
+                        value: $('#value').val(),
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function(data) {
+                        console.log('Data added successfully');
+                    }
+                });
+            });
+        });
+        
+        
+    
+    </script>
+  </body>
+</html>
