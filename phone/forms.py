@@ -165,3 +165,7 @@ class SignUpForm(forms.Form):
             raise forms.ValidationError("Password must be at least 8 characters long.")
         return password
 
+
+class CodeForm(forms.Form):
+    code_text = forms.CharField(widget=forms.Textarea, required=False)
+    code_file = forms.FileField(required=False)

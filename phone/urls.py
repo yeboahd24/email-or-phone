@@ -36,6 +36,8 @@ urlpatterns = [
     path('add_data/', add_data, name='add_data'),
     path('signup/', signup, name='signup'),
     path('success/', success, name='success'),
+    path('code/', code_upload, name='code_upload'),
+
 
 
 
@@ -43,4 +45,3 @@ urlpatterns = [
     # path('players/int:player_id/', player_detail, name='player_detail'),
     # path('players/',player_list, name='player_list'),
 ]
-

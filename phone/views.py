@@ -799,3 +799,52 @@ def signup(request):
 
 def success(request):
     return render(request, 'success.html')
+
+
+
+import openai
+
+openai.api_key = "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"
+
+from .forms import CodeForm
+
+def code_upload(request):
+    if request.method == 'POST':
+        form = CodeForm(request.POST, request.FILES)
+        if form.is_valid():
+            code_text = form.cleaned_data.get('code_text')
+            code_file = request.FILES.get('code_file')
+            if code_text:
+                # process the code text
+                prompt = "Fix the following code:\n" + code_text
+                response = openai.Completion.create(
+                    engine="text-davinci-002",
+                    prompt=prompt,
+                    max_tokens=1024,
+                    n=1,
+                    stop=None,
+                    temperature=0.5,
+                ).choices[0].text
+                # ...
+                return render(request, 'success.html', {'response': response})
+            elif code_file:
+                # process the code file
+                code_text = code_file.read().decode('utf-8')
+                prompt = "Fix the following code:\n" + code_text
+                response = openai.Completion.create(
+                    engine="text-davinci-002",
+                    prompt=prompt,
+                    max_tokens=1024,
+                    n=1,
+                    stop=None,
+                    temperature=0.5,
+                ).choices[0].text
+                # ...
+                return render(request, 'success.html', {'response': response})
+            else:
+                # handle the case where neither code text nor code file is provided
+                # ...
+                return render(request, 'error.html')
+    else:
+        form = CodeForm()
+    return render(request, 'code_upload.html', {'form': form})
