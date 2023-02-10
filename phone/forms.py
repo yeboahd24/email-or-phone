@@ -151,3 +151,17 @@ class MoveForm(forms.Form):
                 raise forms.ValidationError("Invalid move")
             if self.board[row][col] is not None:
                 raise forms.ValidationError("Cell already occupied")
+
+
+from django import forms
+
+class SignUpForm(forms.Form):
+    username = forms.CharField(max_length=100)
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password', 'id': 'password'}))
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if len(password) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters long.")
+        return password
+

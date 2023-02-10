@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#password").on("input", function() {
+                var passwordLength = $(this).val().length;
+                $("#password_length").text(passwordLength);
+            });
+
+            $("form").submit(function(event) {
+                var password = $("#password").val();
+                console.log(password);
+                if (password.length < 8) {
+                    event.preventDefault();
+                    $("#password_error").text("Password must be at least 8 characters long.").show();
+                }
+            });
+        });
+    </script>
+    <title>Sign Up</title>
+</head>
+<body class="bg-gray-300 h-screen">
+    <div class="flex items-center justify-center h-full">
+        <div class="w-full max-w-sm">
+            <form method="post" class="bg-white p-6 rounded-lg shadow-xl">
+                {% csrf_token %}
+                <h1 class="text-lg font-bold mb-4">Sign Up</h1>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="username">
+                        Username
+                    </label>
+                    {{ form.username }}
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="password">
+                        Password
+                    </label>
+                    {{ form.password }}
+                    <div id="password_error" class="text-red-500 text-xs italic mt-2" style="display: none;"></div>
+                </div>
+                <div class="mb-4" style="display: none;">
+                    <label class="block text-gray-700 font-bold mb-2" for="password_length">
+                        Password length
+                    </label>
+                    <span id="password_length"></span>
+                </div>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

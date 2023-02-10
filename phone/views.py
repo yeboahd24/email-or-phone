@@ -781,3 +781,21 @@ def add_data(request):
         value = request.POST.get('value')
         DataPoint.objects.create(value=value)
         return JsonResponse({'status': 'success'})
+
+
+from django.shortcuts import render, redirect
+from .forms import SignUpForm
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            # process the form data
+            return redirect('success')
+            
+    else:
+        form = SignUpForm()
+    return render(request, 'signup2.html', {'form': form})
+
+def success(request):
+    return render(request, 'success.html')
