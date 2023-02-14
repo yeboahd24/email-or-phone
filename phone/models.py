@@ -318,3 +318,14 @@ class DataPoint(models.Model):
 
     def __str__(self):
         return f"DataPoint {self.value}"
+
+
+# models.py
+
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    like_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.title

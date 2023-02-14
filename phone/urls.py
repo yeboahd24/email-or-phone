@@ -37,6 +37,11 @@ urlpatterns = [
     path('signup/', signup, name='signup'),
     path('success/', success, name='success'),
     path('code/', code_upload, name='code_upload'),
+    path('like_post/<int:post_id>/', like_post, name='like_post'),
+    path('post_list/', post_list, name='post_list'),
+    path('list/', list, name='post_list'),
+
+
 
 
 
@@ -45,3 +50,5 @@ urlpatterns = [
     # path('players/int:player_id/', player_detail, name='player_detail'),
     # path('players/',player_list, name='player_list'),
 ]
+# urls.py
+

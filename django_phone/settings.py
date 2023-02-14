@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["*", "langrid.onrender.com"]
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -82,24 +83,24 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "django_phone.wsgi.application"
-ASGI_APPLICATION = "django_phone.application"
+ASGI_APPLICATION = "django_phone.asgi.application"
+WSGI_APPLICATION = 'django_phone.wsgi.application'
 
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    },
-}
 
 # CHANNEL_LAYERS = {
 #     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("127.0.0.1", 6379)],
-#         },
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",
 #     },
 # }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 ASGI_SERVER = "daphne"
 
@@ -258,3 +259,4 @@ CELERY_BEAT_SCHEDULE = {
 
 DICTIONARY_KEY = "15b1025e-5041-4d7b-9f7b-4f74bd0deabe"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+# ASGI_APPLICATION

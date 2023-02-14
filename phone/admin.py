@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import EmailPhoneUser, Device, Stroke, MagicLink, Game, Player, DataPoint
+from .models import EmailPhoneUser, Device, Stroke, MagicLink, Game, Player, DataPoint, Post
 
 
 class CustomUserAdmin(UserAdmin):
@@ -66,3 +66,4 @@ admin.site.register(MagicLink)
 admin.site.register(Game)
 admin.site.register(Player)
 admin.site.register(DataPoint)
+admin.site.register(Post)

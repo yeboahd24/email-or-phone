@@ -848,3 +848,50 @@ def code_upload(request):
     else:
         form = CodeForm()
     return render(request, 'code_upload.html', {'form': form})
+
+
+# views.py
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import Post
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+# @require_http_methods(["POST"])
+# def like_post(request, post_id):
+#     post = get_object_or_404(Post, id=post_id)
+#     post.like_count += 1
+#     post.save()
+#     return JsonResponse({'like_count': post.like_count})
+
+
+
+# views.py
+@require_http_methods(["POST"])
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    post.like_count += 1
+    post.save()
+    
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"post_{post_id}_likes",
+        {
+            "type": "post_like_update",
+            "like_count": post.like_count,
+        }
+    )
+    
+    return JsonResponse({'like_count': post.like_count})
+
+
+
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'template.html', {'posts': posts})
+
+
+def list(request):
+    posts = Post.objects.all()
+    return render(request, 'list.html', {'posts': posts})
