@@ -31,24 +31,16 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
-    path('get_data/', get_data, name='get_data'),
-    path('chart/', chart_view, name='chart_view'),
-    path('add_data/', add_data, name='add_data'),
-    path('signup/', signup, name='signup'),
-    path('success/', success, name='success'),
-    path('code/', code_upload, name='code_upload'),
-    path('like_post/<int:post_id>/', like_post, name='like_post'),
-    path('post_list/', post_list, name='post_list'),
-    path('list/', list, name='post_list'),
-
-
-
-
-
-
-
+    path("get_data/", get_data, name="get_data"),
+    path("chart/", chart_view, name="chart_view"),
+    path("add_data/", add_data, name="add_data"),
+    path("signup/", signup, name="signup"),
+    path("success/", success, name="success"),
+    path("code/", code_upload, name="code_upload"),
+    path("like_post/<int:post_id>/", like_post_view, name="like_post"),
+    path("post_list/", post_list, name="post_list"),
+    path("list/", list, name="list"),
     # path('players/int:player_id/', player_detail, name='player_detail'),
     # path('players/',player_list, name='player_list'),
 ]
 # urls.py
-

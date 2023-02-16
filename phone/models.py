@@ -263,7 +263,7 @@ class Player(models.Model):
 
 
 class Game(models.Model):
-    board = models.CharField(max_length=9, default='-'*9)
+    board = models.CharField(max_length=9, default="-" * 9)
     winner = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -271,30 +271,30 @@ class Game(models.Model):
         return f"Game {self.id}"
 
     def next_player(self):
-        x_count = self.board.count('X')
-        o_count = self.board.count('O')
+        x_count = self.board.count("X")
+        o_count = self.board.count("O")
         if x_count <= o_count:
-            return Player.objects.get(symbol='X')
+            return Player.objects.get(symbol="X")
         else:
-            return Player.objects.get(symbol='O')
+            return Player.objects.get(symbol="O")
 
     def is_finished(self):
         board = self.board
-        if board[0] == board[1] == board[2] and board[0] != ' ':
+        if board[0] == board[1] == board[2] and board[0] != " ":
             return True
-        elif board[3] == board[4] == board[5] and board[3] != ' ':
+        elif board[3] == board[4] == board[5] and board[3] != " ":
             return True
-        elif board[6] == board[7] == board[8] and board[6] != ' ':
+        elif board[6] == board[7] == board[8] and board[6] != " ":
             return True
-        elif board[0] == board[3] == board[6] and board[0] != ' ':
+        elif board[0] == board[3] == board[6] and board[0] != " ":
             return True
-        elif board[1] == board[4] == board[7] and board[1] != ' ':
+        elif board[1] == board[4] == board[7] and board[1] != " ":
             return True
-        elif board[2] == board[5] == board[8] and board[2] != ' ':
+        elif board[2] == board[5] == board[8] and board[2] != " ":
             return True
-        elif board[0] == board[4] == board[8] and board[0] != ' ':
+        elif board[0] == board[4] == board[8] and board[0] != " ":
             return True
-        elif board[2] == board[4] == board[6] and board[2] != ' ':
+        elif board[2] == board[4] == board[6] and board[2] != " ":
             return True
         else:
             return False
@@ -302,6 +302,7 @@ class Game(models.Model):
 
 from django.contrib.auth.models import User
 from django.db import models
+
 
 class PasswordResetToken(models.Model):
     token = models.CharField(max_length=100, unique=True)
@@ -322,6 +323,7 @@ class DataPoint(models.Model):
 
 # models.py
 
+
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
@@ -329,3 +331,17 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+
+@receiver(post_save, sender=Post)
+def post_like_count_changed(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+    group_name = f"post_like_{instance.id}"
+    event = {"type": "post_like_update", "like_count": instance.like_count}
+    async_to_sync(channel_layer.group_send)(group_name, event)

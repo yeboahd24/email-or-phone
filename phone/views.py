@@ -764,42 +764,46 @@ class PasswordResetConfirmView(GenericAPIView):
 from django.http import JsonResponse
 from .models import DataPoint
 
+
 def get_data(request):
-    data = list(DataPoint.objects.values('value', 'created_at'))
-    return JsonResponse({'data': data})
+    data = list(DataPoint.objects.values("value", "created_at"))
+    return JsonResponse({"data": data})
     # return render(request, 'chart.html', {'data': data})
+
 
 from django.shortcuts import render
 
+
 def chart_view(request):
-    return render(request, 'chart.html')
+    return render(request, "chart.html")
 
 
 @csrf_exempt
 def add_data(request):
-    if request.method == 'POST':
-        value = request.POST.get('value')
+    if request.method == "POST":
+        value = request.POST.get("value")
         DataPoint.objects.create(value=value)
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({"status": "success"})
 
 
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
 
+
 def signup(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
             # process the form data
-            return redirect('success')
-            
+            return redirect("success")
+
     else:
         form = SignUpForm()
-    return render(request, 'signup2.html', {'form': form})
+    return render(request, "signup2.html", {"form": form})
+
 
 def success(request):
-    return render(request, 'success.html')
-
+    return render(request, "success.html")
 
 
 import openai
@@ -808,90 +812,95 @@ openai.api_key = "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"
 
 from .forms import CodeForm
 
+
 def code_upload(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = CodeForm(request.POST, request.FILES)
         if form.is_valid():
-            code_text = form.cleaned_data.get('code_text')
-            code_file = request.FILES.get('code_file')
+            code_text = form.cleaned_data.get("code_text")
+            code_file = request.FILES.get("code_file")
             if code_text:
                 # process the code text
                 prompt = "Fix the following code:\n" + code_text
-                response = openai.Completion.create(
-                    engine="text-davinci-002",
-                    prompt=prompt,
-                    max_tokens=1024,
-                    n=1,
-                    stop=None,
-                    temperature=0.5,
-                ).choices[0].text
+                response = (
+                    openai.Completion.create(
+                        engine="text-davinci-002",
+                        prompt=prompt,
+                        max_tokens=1024,
+                        n=1,
+                        stop=None,
+                        temperature=0.5,
+                    )
+                    .choices[0]
+                    .text
+                )
                 # ...
-                return render(request, 'success.html', {'response': response})
+                return render(request, "success.html", {"response": response})
             elif code_file:
                 # process the code file
-                code_text = code_file.read().decode('utf-8')
+                code_text = code_file.read().decode("utf-8")
                 prompt = "Fix the following code:\n" + code_text
-                response = openai.Completion.create(
-                    engine="text-davinci-002",
-                    prompt=prompt,
-                    max_tokens=1024,
-                    n=1,
-                    stop=None,
-                    temperature=0.5,
-                ).choices[0].text
+                response = (
+                    openai.Completion.create(
+                        engine="text-davinci-002",
+                        prompt=prompt,
+                        max_tokens=1024,
+                        n=1,
+                        stop=None,
+                        temperature=0.5,
+                    )
+                    .choices[0]
+                    .text
+                )
                 # ...
-                return render(request, 'success.html', {'response': response})
+                return render(request, "success.html", {"response": response})
             else:
                 # handle the case where neither code text nor code file is provided
                 # ...
-                return render(request, 'error.html')
+                return render(request, "error.html")
     else:
         form = CodeForm()
-    return render(request, 'code_upload.html', {'form': form})
+    return render(request, "code_upload.html", {"form": form})
 
 
 # views.py
-from django.views.decorators.http import require_http_methods
+import asyncio
+from channels.db import database_sync_to_async
+from channels.layers import get_channel_layer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from .models import Post
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-# @require_http_methods(["POST"])
-# def like_post(request, post_id):
-#     post = get_object_or_404(Post, id=post_id)
-#     post.like_count += 1
-#     post.save()
-#     return JsonResponse({'like_count': post.like_count})
 
-
-
-# views.py
+@csrf_exempt
 @require_http_methods(["POST"])
-def like_post(request, post_id):
+def like_post_view(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     post.like_count += 1
     post.save()
-    
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        f"post_{post_id}_likes",
-        {
-            "type": "post_like_update",
-            "like_count": post.like_count,
-        }
-    )
-    
-    return JsonResponse({'like_count': post.like_count})
 
+    async def send_like_update():
+        channel_layer = get_channel_layer()
+        group_name = "test_group"
+        print("Sending update to group {}".format(group_name))
+        await channel_layer.group_send(
+            group_name,
+            {"type": "update_post_likes", "post_id": post_id},
+        )
+        print("Update sent")
+
+    async_to_sync(send_like_update)()
+
+    return JsonResponse({"success": post.like_count})
 
 
 def post_list(request):
     posts = Post.objects.all()
-    return render(request, 'template.html', {'posts': posts})
+    return render(request, "template.html", {"posts": posts})
 
 
 def list(request):
-    posts = Post.objects.all()
-    return render(request, 'list.html', {'posts': posts})
+    return render(request, "list.html")

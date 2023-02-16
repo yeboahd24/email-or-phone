@@ -1,68 +1,81 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Real-time Like System</title>
     <!-- Include the Tailwind CSS CDN -->
-    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body class="p-10">
     <div class="flex justify-center">
-        <div class="container mx-auto">
-            {% for post in posts %}
-              <div class="my-8 bg-white p-8 rounded-lg shadow-lg">
-                <p class="text-gray-700">{{ post.content }}</p>
-                <p class="text-gray-700">{{ post.like_count }} likes</p>
-                <button class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-                        data-post-id="{{ post.id }}"
-                        onclick="likePost(this)">Like</button>
-              </div>
-            {% endfor %}
-          </div>
+      <div class="container mx-auto">
+        {% for post in posts %}
+        <div class="my-8 bg-white p-8 rounded-lg shadow-lg" data-post-id="{{ post.id }}">
+          <p class="text-gray-700">{{ post.content }}</p>
+          <p class="text-gray-700" data-like-count>{{ post.like_count }} likes</p>
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+            data-post-id="{{ post.id }}"
+            onclick="likePost(event.target)"
+          >
+            Like
+          </button>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-       function connect(postId) {
-        var socket = new WebSocket(`ws://${window.location.host}/ws/post/${postId}/like/`);
-        console.log(socket)
+      var socket = new WebSocket("ws://" + window.location.host + "/ws/test/");
 
-        socket.onopen = function(e) {
-            console.log("Successfully connected to the WebSocket.");
-        }
-
-        socket.onclose = function(e) {
-            console.log("WebSocket connection closed unexpectedly. Trying to reconnect in 2s...");
-            setTimeout(function() {
-                console.log("Reconnecting...");
-                connect(postId);
-            }, 2000);
-        };
-
-  
-      socket.onmessage = function(event) {
-        console.log(event.data);
+      socket.onmessage = function (event) {
         var data = JSON.parse(event.data);
-        var postId = data.post;
-        var likeCount = data.like_count;
-        $("button[data-post-id=" + postId + "]").siblings("p:last-of-type").text(likeCount + " likes");
-      };
-  
-    }
-
-    function likePost(button) {
-    var postId = button.dataset.postId;
-    connect(postId);
-    $.ajax({
-        type: "POST",
-        url: "/like_post/" + postId + "/",
-        headers: {
-        "X-CSRFToken": "{{ csrf_token }}"
-        },
-        success: function(data) {
-        $(button).siblings("p:last-of-type").text(data.like_count + " likes");
+        if (data.html) {
+          var updatedPost = $(data.html).find(
+            "[data-post-id='" + data.post_id + "']"
+          );
+          updatedPost.find("[data-like-count]").text(data.like_count + " likes");
         }
-    });
-    }
+      };
+
+      function likePost(button) {
+        var postId = button.dataset.postId;
+        var post = document.querySelector("[data-post-id='" + postId + "']");
+        var likeCount = post.querySelector("[data-like-count]");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/like_post/" + postId + "/");
+        xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            var data = JSON.stringify({
+              html: post.outerHTML,
+              post_id: postId,
+              like_count: parseInt(likeCount.textContent) + 1
+            });
+            socket.send(data);
+          }
+        };
+        xhr.send();
+      }
+
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          var cookies = document.cookie.split(";");
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
     </script>
-  </
+  </body>
+</html>
