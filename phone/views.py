@@ -904,3 +904,32 @@ def post_list(request):
 
 def list(request):
     return render(request, "list.html")
+
+
+from .forms import FormStep1, FormStep2
+
+
+def form_step1(request):
+    if request.method == "POST":
+        form = FormStep1(request.POST)
+        form.name = request.POST.get("name")
+        form.email = request.POST.get("email")
+        if form.is_valid():
+            form.save()
+            return redirect("form_step2")
+    else:
+        form = FormStep1()
+    return render(request, "form_step1.html", {"form": form})
+
+
+def form_step2(request):
+    if request.method == "POST":
+        form = FormStep2(request.POST)
+        form.phone = request.POST.get("phone")
+        form.address = request.POST.get("address")
+        if form.is_valid():
+            form.save()
+            return redirect("success")
+    else:
+        form = FormStep2()
+    return render(request, "form_step2.html", {"form": form})

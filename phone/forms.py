@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 
 # from .models import Recipe, Cookbook
-
+from .models import FormStep1, FormStep2
 
 User = get_user_model()
 
@@ -53,7 +53,6 @@ class WordForm(forms.Form):
 
 
 class SignUpForm(forms.ModelForm):
-
     username = forms.CharField(max_length=30, required=True, label="Email")
     # first_name = forms.CharField(max_length=30, required=False)
     # last_name = forms.CharField(max_length=30, required=False)
@@ -111,25 +110,26 @@ class LoginForm2(forms.Form):
         return self.cleaned_data
 
 
-
 # forms.py
+
 
 class Page1Form(forms.Form):
     email = forms.EmailField()
     full_name = forms.CharField(max_length=100)
 
+
 class Page2Form(forms.Form):
     country = forms.CharField(max_length=100)
     phone_number = forms.CharField(max_length=20)
 
+
 class Page3Form(forms.Form):
     GENDER_CHOICES = [
-        ('male', 'Male'),
-        ('female', 'Female'),
+        ("male", "Male"),
+        ("female", "Female"),
     ]
     gender = forms.ChoiceField(choices=GENDER_CHOICES)
     occupation = forms.CharField(max_length=100)
-
 
 
 class MoveForm(forms.Form):
@@ -137,14 +137,14 @@ class MoveForm(forms.Form):
     col = forms.IntegerField()
 
     def __init__(self, *args, **kwargs):
-        board = kwargs.pop('board')
+        board = kwargs.pop("board")
         super().__init__(*args, **kwargs)
         self.board = board
 
     def clean(self):
         cleaned_data = super().clean()
-        row = cleaned_data.get('row')
-        col = cleaned_data.get('col')
+        row = cleaned_data.get("row")
+        col = cleaned_data.get("col")
 
         if row is not None and col is not None:
             if not (0 <= row < 3 and 0 <= col < 3):
@@ -155,12 +155,17 @@ class MoveForm(forms.Form):
 
 from django import forms
 
+
 class SignUpForm(forms.Form):
     username = forms.CharField(max_length=100)
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password', 'id': 'password'}))
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control", "placeholder": "Password", "id": "password"}
+        )
+    )
 
     def clean_password(self):
-        password = self.cleaned_data.get('password')
+        password = self.cleaned_data.get("password")
         if len(password) < 8:
             raise forms.ValidationError("Password must be at least 8 characters long.")
         return password
@@ -169,3 +174,15 @@ class SignUpForm(forms.Form):
 class CodeForm(forms.Form):
     code_text = forms.CharField(widget=forms.Textarea, required=False)
     code_file = forms.FileField(required=False)
+
+
+class FormStep1(forms.ModelForm):
+    class Meta:
+        model = FormStep1
+        fields = "__all__"
+
+
+class FormStep2(forms.ModelForm):
+    class Meta:
+        model = FormStep2
+        fields = "__all__"

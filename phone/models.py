@@ -333,15 +333,11 @@ class Post(models.Model):
         return self.title
 
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+class FormStep1(models.Model):
+    name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField()
 
 
-@receiver(post_save, sender=Post)
-def post_like_count_changed(sender, instance, **kwargs):
-    channel_layer = get_channel_layer()
-    group_name = f"post_like_{instance.id}"
-    event = {"type": "post_like_update", "like_count": instance.like_count}
-    async_to_sync(channel_layer.group_send)(group_name, event)
+class FormStep2(models.Model):
+    phone = models.CharField(max_length=20, blank=True)
+    address = models.CharField(max_length=200, blank=True)

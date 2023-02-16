@@ -40,6 +40,8 @@ urlpatterns = [
     path("like_post/<int:post_id>/", like_post_view, name="like_post"),
     path("post_list/", post_list, name="post_list"),
     path("list/", list, name="list"),
+    path("form_step1/", form_step1, name="form_step1"),
+    path("form_step2/", form_step2, name="form_step2"),
     # path('players/int:player_id/', player_detail, name='player_detail'),
     # path('players/',player_list, name='player_list'),
 ]
