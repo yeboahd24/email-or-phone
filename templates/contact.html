@@ -1,0 +1,44 @@
+<!doctype html>
+{% load crispy_forms_tags %}
+{% load static %}
+
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Contact Us</title>
+    <meta name="description" content="Get in touch with us using this easy-to-use form.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/flags.min.css' %}" rel="stylesheet">
+</head>
+
+<body class="bg-gray-50">
+   <div class="container mx-auto my-10">
+    <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+      <h1 class="text-3xl font-bold mb-4 text-center">Contact Us</h1>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            {{ form.name|as_crispy_field }}
+        </div>
+        <div class="mb-4">
+            {{ form.email|as_crispy_field }}
+        </div>
+        <div class="mb-4">
+            {{ form.country|as_crispy_field }}
+        </div>
+        <div class="relative mb-4">
+          <div class="absolute inset-y-0 left-0 pl-3 pt-2">
+			<i class="{{ country.flag_css }}"></i>           
+          </div>
+          {{ form.phone|as_crispy_field }}
+        </div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full">Send Message</button>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

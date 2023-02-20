@@ -933,3 +933,84 @@ def form_step2(request):
     else:
         form = FormStep2()
     return render(request, "form_step2.html", {"form": form})
+
+
+from django.shortcuts import render, redirect
+from .forms import MyForm
+from .models import MyModel
+
+from django.shortcuts import render, redirect
+from .forms import MyForm
+
+
+def my_view(request):
+    choices = MyModel.objects.all().values_list("name", flat=True)
+    if request.method == "POST":
+        form = MyForm(request.POST)
+        if form.is_valid():
+            # Process the form data as before
+            # ...
+            return redirect("success")
+    else:
+        form = MyForm()
+    return render(request, "my_template.html", {"form": form, "choices": choices})
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from .models import MyModel
+
+
+@require_GET
+def get_choices(request):
+    # Query the choices from the database
+    choices = list(MyModel.objects.values_list("name", flat=True))
+    return JsonResponse(choices, safe=False)
+
+
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib import messages
+
+import phonenumbers
+from phonenumbers import geocoder, carrier
+
+from .forms import ContactForm
+
+
+def contact(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Get the cleaned data from the form
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            country = form.cleaned_data["country"]
+            phone_number = form.cleaned_data["phone"]
+            message = form.cleaned_data["message"]
+
+            # Parse the phone number using phonenumbers
+            parsed_number = phonenumbers.parse(phone_number, country)
+
+            # Add the country code to the phone number
+            phone_with_country_code = phonenumbers.format_number(
+                parsed_number, phonenumbers.PhoneNumberFormat.E164
+            )
+
+            # Get the carrier and geographic information for the phone number
+            carrier_name = carrier.name_for_number(parsed_number, "en")
+            location = geocoder.description_for_number(parsed_number, "en")
+
+            # TODO: Do something with the contact form data, e.g. send an email or save to a database
+
+            # Show a success message and redirect to the home page
+            messages.success(request, "Thank you for your message!")
+            return HttpResponseRedirect(reverse("home"))
+    else:
+        form = ContactForm()
+
+    context = {
+        "form": form,
+    }
+    return render(request, "contact.html", context)

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My Form</title>
+    <!-- Load CSS styles -->
+    {% comment %} <link rel="stylesheet" href="https://unpkg.com/@glidejs/glide@3.4.1.1/glide/dist/css/glide.core.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@glidejs/glide@3.4.1.1/glide/dist/css/glide.theme.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@glidejs/glide@3.4.1.1/glide/dist/css/glide.partial.min.css"> {% endcomment %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tarekraafat-autocomplete.js/10.2.7/css/autoComplete.min.css">
+</head>
+<body>
+    <form>
+        <div class="form-group">
+            <label for="my-input">Select multiple items:</label>
+            <input type="text" class="form-control" id="my-input" placeholder="Start typing to search...">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tarekraafat-autocomplete.js/10.2.7/autoComplete.min.js"></script>
+    <script>
+    // Create the autoComplete instance
+    const autoCompleteJS = new autoComplete({
+      selector: '#my-input',
+      source: async (query, response) => {
+        // Fetch the choices from the server
+        const url = '/get_choices/?q=' + query;
+        const choicesResponse = await fetch(url);
+        const choices = await choicesResponse.json();
+        console.log(choices);
+        // Filter the choices based on the query
+        {% comment %} const filteredChoices = choices.filter(choice => choice.toLowerCase().startsWith(query.toLowerCase())); {% endcomment %}
+        // Return the filtered choices
+        {% comment %} response(filteredChoices); {% endcomment %}
+      },
+      // Update the input field with the selected choice
+      {% comment %} onSelect: (event, term, item) => {
+        document.querySelector('#my-input').value = term;
+      } {% endcomment %}
+    });
+    
+    </script>
+    
+  </body>
+</html>

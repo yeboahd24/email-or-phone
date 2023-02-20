@@ -1,8 +1,12 @@
 from django import forms
 from django.contrib.auth import get_user_model
+import phonenumbers
+from .models import MyModel
+from django_countries.fields import CountryField
 
 # from .models import Recipe, Cookbook
 from .models import FormStep1, FormStep2
+from django_countries.widgets import CountrySelectWidget
 
 User = get_user_model()
 
@@ -153,9 +157,6 @@ class MoveForm(forms.Form):
                 raise forms.ValidationError("Cell already occupied")
 
 
-from django import forms
-
-
 class SignUpForm(forms.Form):
     username = forms.CharField(max_length=100)
     password = forms.CharField(
@@ -186,3 +187,31 @@ class FormStep2(forms.ModelForm):
     class Meta:
         model = FormStep2
         fields = "__all__"
+
+
+# from .models import MyModel
+
+
+class MyForm(forms.Form):
+    choices = forms.ModelMultipleChoiceField(queryset=MyModel.objects.all())
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    # country = CountryField(attrs={"class": "form-control"}).formfield()
+    phone = forms.CharField()
+    country = CountryField(blank_label="(select country)").formfield(
+        required=False,
+        widget=CountrySelectWidget(attrs={"class": "custom-select d-block w-100"}),
+    )
+
+    def clean_phone(self):
+        phone = self.cleaned_data["phone"]
+        country = self.cleaned_data["country"]
+        parsed_phone = phonenumbers.parse(phone, country.code)
+        if not phonenumbers.is_valid_number(parsed_phone):
+            raise forms.ValidationError("Please enter a valid phone number.")
+        return phonenumbers.format_number(
+            parsed_phone, phonenumbers.PhoneNumberFormat.E164
+        )

@@ -42,6 +42,9 @@ urlpatterns = [
     path("list/", list, name="list"),
     path("form_step1/", form_step1, name="form_step1"),
     path("form_step2/", form_step2, name="form_step2"),
+    path("my_view/", my_view, name="my_view"),
+    path("get_choices/", get_choices, name="search"),
+    path("contact/", contact, name="contact"),
     # path('players/int:player_id/', player_detail, name='player_detail'),
     # path('players/',player_list, name='player_list'),
 ]

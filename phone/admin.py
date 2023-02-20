@@ -11,6 +11,7 @@ from .models import (
     Post,
     FormStep1,
     FormStep2,
+    MyModel,
 )
 
 
@@ -80,3 +81,4 @@ admin.site.register(DataPoint)
 admin.site.register(Post)
 admin.site.register(FormStep1)
 admin.site.register(FormStep2)
+admin.site.register(MyModel)
