@@ -215,3 +215,9 @@ class ContactForm(forms.Form):
         return phonenumbers.format_number(
             parsed_phone, phonenumbers.PhoneNumberFormat.E164
         )
+
+
+from django.contrib.auth.forms import AuthenticationForm
+
+class RememberMeAuthenticationForm(AuthenticationForm):
+    remember_me = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput)

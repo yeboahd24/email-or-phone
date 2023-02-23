@@ -1014,3 +1014,47 @@ def contact(request):
         "form": form,
     }
     return render(request, "contact.html", context)
+
+
+
+from django.contrib.auth.views import LoginView
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
+from datetime import timedelta
+from django.urls import reverse_lazy
+from .forms import RememberMeAuthenticationForm
+
+
+class CustomLoginView(LoginView):
+    template_name = 'remember.html'
+    form_class = RememberMeAuthenticationForm
+    success_url = reverse_lazy('chart_view') 
+
+
+      
+    def get_success_url(self):
+        return self.success_url
+
+    def form_valid(self, form):
+        remember_me = form.cleaned_data.get('remember_me')
+        if remember_me:
+            print("yes it working")
+            self.request.session.set_expiry(timedelta(days=30))
+        else:
+            self.request.session.set_expiry(0)
+        return super().form_valid(form)
+
+
+
+from django.contrib.auth.views import LogoutView
+from django.http import HttpResponseRedirect
+
+class CustomLogoutView(LogoutView):
+    next_page = '/remember/'
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            request.session.flush()
+            response.delete_cookie('sessionid')
+        return response

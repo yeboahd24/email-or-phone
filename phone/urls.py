@@ -45,6 +45,7 @@ urlpatterns = [
     path("my_view/", my_view, name="my_view"),
     path("get_choices/", get_choices, name="search"),
     path("contact/", contact, name="contact"),
+    path("remember/", CustomLoginView.as_view(), name="remember")
     # path('players/int:player_id/', player_detail, name='player_detail'),
     # path('players/',player_list, name='player_list'),
 ]
