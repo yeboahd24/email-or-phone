@@ -1058,3 +1058,165 @@ class CustomLogoutView(LogoutView):
             request.session.flush()
             response.delete_cookie('sessionid')
         return response
+
+
+from supabase import create_client
+import supabase
+from django.shortcuts import redirect
+from django.urls import reverse
+
+SUPABASE_URL = 'https://ccfmytlvtfuhqhucbeuu.supabase.co'
+SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZm15dGx2dGZ1aHFodWNiZXV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzczNzQxMTgsImV4cCI6MTk5Mjk1MDExOH0.e63wPAN2hbaoKgSLtFvotZsS5bhG9uM-NBhawbbaPj0'
+
+from supabase import create_client
+ 
+# supabase login
+
+def login_supabase(request):
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+            client = create_client(SUPABASE_URL, SUPABASE_KEY)
+            try:
+                user = client.query(
+                    "SELECT * FROM users WHERE username = :username AND password = :password",
+                    {"username": username, "password": password},
+                )
+                if user:
+                    user = user[0]
+                    request.session["user_id"] = user["id"]
+                    request.session["username"] = user["username"]
+                    return redirect("home")
+                else:
+                    form.add_error("username", "Invalid username or password")
+            except SupabaseError as e:
+                form.add_error("username", str(e))
+    else:
+        form = SignUpForm()
+    return render(request, "login.html", {"form": form})
+     
+SUPABASE_URL = 'https://ccfmytlvtfuhqhucbeuu.supabase.co'
+SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZm15dGx2dGZ1aHFodWNiZXV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzczNzQxMTgsImV4cCI6MTk5Mjk1MDExOH0.e63wPAN2hbaoKgSLtFvotZsS5bhG9uM-NBhawbbaPj0'
+
+client = create_client(SUPABASE_URL, SUPABASE_KEY)
+auth = client.auth
+
+
+
+# def login(request):
+#     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+#     redirect_url = request.build_absolute_uri(reverse('callback'))
+#     url = auth.authorization_url(redirect_url)
+#     return redirect(url)
+    
+
+ 
+# def callback(request):
+#     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+#     redirect_url = request.build_absolute_uri(reverse('callback'))
+#     code = request.GET.get('code')
+#     if not code:
+#         return redirect(reverse('login'))
+#     token = supabase.auth.exchange_code_for_token(code, redirect_url)
+#     request.session['access_token'] = token['access_token']
+#     return redirect(reverse('home'))
+     
+
+
+
+# from django.shortcuts import redirect
+# from django.urls import reverse
+# from django.views.generic import View
+# from django.conf import settings
+
+# class LoginView(View):
+#     print("inside login view")
+#     def get(self, request):
+#         # Generate the Supabase authentication URL
+#         redirect_uri = request.build_absolute_uri(reverse('callback'))
+#         print(redirect_uri)
+#         auth_url = f"{settings.SUPABASE_URL}/oauth/v2/auth?client_id={settings.SUPABASE_KEY}&redirect_uri={redirect_uri}&response_type=code&scope=openid%20profile%20email"
+
+#         # Redirect the user to the authentication URL
+#         return redirect(auth_url)
+
+
+
+from django.shortcuts import redirect, reverse
+from django.views import View
+from supabase import create_client
+
+
+
+from django.shortcuts import redirect, reverse
+from django.views import View
+from supabase import create_client
+
+
+class LoginView(View):
+    def get(self, request):
+        client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        auth = client.auth
+
+        # generate the authorization URL to start the authentication flow
+        auth_url = auth.authorization_url()
+
+        # store the auth state in the user's session
+        request.session['supabase_auth_state'] = auth.auth_state_token
+
+        # redirect the user to the authorization URL
+        return redirect(auth_url)
+
+    def post(self, request):
+        client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        auth = client.auth
+
+        # extract the access token and refresh token from the user's session
+        access_token = request.session.get('supabase_access_token')
+        refresh_token = request.session.get('supabase_refresh_token')
+
+        if not access_token or not refresh_token:
+            # access token or refresh token is missing, redirect back to the login page
+            return redirect(reverse('login'))
+
+        # authenticate the user with Supabase using the access token and refresh token
+        auth.set_access_token(access_token)
+        auth.set_refresh_token(refresh_token)
+        user = auth.user()
+
+        # check if the user is authenticated
+        if not user:
+            # user is not authenticated, redirect back to the login page
+            return redirect(reverse('login'))
+
+        # user is authenticated, log them in to your Django app
+        # ...
+
+        # redirect the user to the home page
+        return redirect(reverse('home'))
+
+
+def supabase_callback(request):
+    client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    auth = client.auth
+
+    # extract the authorization code and state token from the request
+    code = request.GET.get('code')
+    state = request.GET.get('state')
+
+    # check that the state token matches the one stored in the user's session
+    if state != request.session.get('supabase_auth_state'):
+        # state token doesn't match, redirect back to the login page
+        return redirect(reverse('login'))
+
+    # exchange the authorization code for an access token and refresh token
+    token_response = auth.exchange_code_for_token(code)
+
+    # store the access token and refresh token in the user's session
+    request.session['supabase_access_token'] = token_response['access_token']
+    request.session['supabase_refresh_token'] = token_response['refresh_token']
+
+    # redirect the user to the home page
+    return redirect(reverse('success'))

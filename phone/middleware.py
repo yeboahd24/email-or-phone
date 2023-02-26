@@ -42,3 +42,25 @@ class LockoutMiddleware:
 
         response = self.get_response(request)
         return response
+
+
+
+# from django.shortcuts import redirect
+# from django.urls import reverse
+
+# class SupabaseAuthenticationMiddleware:
+#     print("SupabaseAuthenticationMiddleware")
+#     def __init__(self, get_response):
+#         self.get_response = get_response
+
+#     def __call__(self, request):
+#         if request.session.get('access_token'):
+#             # Access token is present, pass the request along
+#             response = self.get_response(request)
+#         else:
+#             # Access token is not present, redirect to the login view
+#             login_url = reverse('signin')
+#             response = redirect(login_url)
+
+#         return response
+

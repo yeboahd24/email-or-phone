@@ -66,6 +66,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "phone.middleware.LockoutMiddleware",
+    # "phone.middleware.SupabaseAuthenticationMiddleware",
 ]
 
 ROOT_URLCONF = "django_phone.urls"
@@ -111,10 +112,24 @@ ASGI_SERVER = "daphne"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": os.path.join(BASE_DIR / "db.sqlite3"),
+#     }
+# }
+
+
+
+# Postgresql Database (supabase)
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR / "db.sqlite3"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "YshAOOq208MIakMy",
+        "HOST": "db.ccfmytlvtfuhqhucbeuu.supabase.co",
+        "PORT": "5432",
     }
 }
 
@@ -259,3 +274,8 @@ CELERY_BEAT_SCHEDULE = {
 DICTIONARY_KEY = "15b1025e-5041-4d7b-9f7b-4f74bd0deabe"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 # ASGI_APPLICATION
+
+     
+SUPABASE_URL = 'https://ccfmytlvtfuhqhucbeuu.supabase.co'
+SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZm15dGx2dGZ1aHFodWNiZXV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzczNzQxMTgsImV4cCI6MTk5Mjk1MDExOH0.e63wPAN2hbaoKgSLtFvotZsS5bhG9uM-NBhawbbaPj0'
+
