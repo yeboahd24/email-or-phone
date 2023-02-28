@@ -12,6 +12,7 @@ from .models import (
     FormStep1,
     FormStep2,
     MyModel,
+    Book
 )
 
 
@@ -72,6 +73,14 @@ class DeviceAdmin(admin.ModelAdmin):
         return False
 
 
+
+
+from parler.admin import TranslatableAdmin
+
+class BookAdmin(TranslatableAdmin):
+    fields = ('title', 'author', 'description')
+
+admin.site.register(Book, BookAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Stroke)
 admin.site.register(MagicLink)
@@ -82,3 +91,6 @@ admin.site.register(Post)
 admin.site.register(FormStep1)
 admin.site.register(FormStep2)
 admin.site.register(MyModel)
+
+
+

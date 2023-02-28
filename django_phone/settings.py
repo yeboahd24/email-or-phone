@@ -55,11 +55,14 @@ INSTALLED_APPS = [
     "channels",
     "django_private_chat2.apps.DjangoPrivateChat2Config",
     "crispy_forms",
+    'parler',
+
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'django.middleware.locale.LocaleMiddleware', # new
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -68,6 +71,12 @@ MIDDLEWARE = [
     "phone.middleware.LockoutMiddleware",
     # "phone.middleware.SupabaseAuthenticationMiddleware",
 ]
+
+
+
+LOCALE_PATHS = (
+os.path.join(BASE_DIR, 'locale/'),
+)
 
 ROOT_URLCONF = "django_phone.urls"
 
@@ -82,6 +91,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'phone.context_processors.site_name', # new
+
             ],
         },
     },
@@ -279,3 +290,37 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 SUPABASE_URL = 'https://ccfmytlvtfuhqhucbeuu.supabase.co'
 SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZm15dGx2dGZ1aHFodWNiZXV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzczNzQxMTgsImV4cCI6MTk5Mjk1MDExOH0.e63wPAN2hbaoKgSLtFvotZsS5bhG9uM-NBhawbbaPj0'
 
+
+# Language settings
+LANGUAGES = [
+    ('en', 'English'),
+    ('fr', 'French'),
+]
+
+# PARLER_LANGUAGES = {
+#     None: (
+#         {'code': 'en',},
+#         {'code': 'fr',},
+#     ),
+#     'default': {
+#         'fallbacks': ['en', 'fr'],
+#     }
+# }
+
+PARLER_LANGUAGES = {
+    1: (
+        {
+            "code": "en",
+        },
+        {
+            "code": "fr",
+        },
+    ),
+    "default": {
+        "fallbacks": ["fr", "en"],
+        "hide_untranslated": False,
+    },
+}
+
+PARLER_DEFAULT_LANGUAGE_CODE = "en"
+SITE_NAME = "django"

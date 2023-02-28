@@ -1,6 +1,7 @@
 from phone.views import *
 from django.urls import path, re_path
 from django.contrib.auth import views as auth_views
+from django.views.i18n import set_language
 
 
 urlpatterns = [
@@ -48,6 +49,9 @@ urlpatterns = [
     path("remember/", CustomLoginView.as_view(), name="remember"),
     path("callback/", supabase_callback, name="callback"),
     path("login/", login, name="login"),
+    path("books/", book_list, name="books"),
+    path('set-language/', set_language, name='set_language'),
+
     # path("signin/", LoginView.as_view(), name="signin"),
     # path("test/", login_supabase, name="test"),
     # path('players/int:player_id/', player_detail, name='player_detail'),

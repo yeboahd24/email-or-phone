@@ -347,3 +347,17 @@ class MyModel(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+from parler.models import TranslatableModel, TranslatedFields
+
+class Book(TranslatableModel):
+    translations = TranslatedFields(
+        title=models.CharField(max_length=200, blank=True, null=True),
+        author=models.CharField(max_length=100, blank=True, null=True),
+        description=models.TextField(blank=True, null=True),
+    )
+
+    def __str__(self):
+        return self.title

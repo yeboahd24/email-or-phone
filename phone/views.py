@@ -1220,3 +1220,11 @@ def supabase_callback(request):
 
     # redirect the user to the home page
     return redirect(reverse('success'))
+
+
+
+from .models import Book
+
+def book_list(request):
+    books = Book.objects.all()
+    return render(request, 'book_list.html', {'books': books})

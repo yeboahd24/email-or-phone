@@ -1,0 +1,56 @@
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ request.site.name }} | {% translate "Django Parler Testing" %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
+    {% block custom_css %}{% endblock custom_css %}
+  </head>
+  <body>
+    <header>
+      <h1>{{ request.site.name }} | {% block h1 %}{% translate "Django Parler" %}{% endblock h1 %}</h1>
+    </header>
+    <main>
+      {% block main %}
+      {% endblock main %}
+    </main>
+    <footer>
+      {% block footer %}
+        <p>
+          {% if user.is_authenticated and user.is_staff %}
+            <i><a href="{% url "admin:index" %}">{% translate "Admin" %}</a> &bull; <a href="{% url "admin:logout" %}">{% translate "Logout" %}</a></i>
+          {% endif %}
+          <form action="{% url 'set_language' %}" method="post" id="language-chooser">{% csrf_token %}
+            <input name="next" type="hidden" value="{{ redirect_to }}">
+            <select name="language">
+              {% get_available_languages as LANGUAGES %}
+              {% get_language_info_list for LANGUAGES as languages %}
+              {% for language in languages %}
+                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                  {{ language.code }}
+                </option>
+              {% endfor %}
+            </select>
+            <input type="submit" value="{% translate 'Apply' %}">
+          </form>
+        </p>
+        {% blocktrans %}
+          <p>
+            {{ site_name }}, a <a href="https://django-parler.readthedocs.io/en/stable/index.html">django-parler</a> instance.
+          </p>
+          <p>
+            <i>
+              Powered by <a href="https://docs.djangoproject.com/">Django</a>, and  <a href="https://django-parler.readthedocs.io/en/stable/index.html">Django Parler</a>.
+            </i>
+          </p>
+        {% endblocktrans %}
+      {% endblock footer %}
+    </footer>
+  </body>
+  {% block custom_js %}{% endblock custom_js %}
+</html>
