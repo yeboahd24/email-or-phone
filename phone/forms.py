@@ -221,3 +221,9 @@ from django.contrib.auth.forms import AuthenticationForm
 
 class RememberMeAuthenticationForm(AuthenticationForm):
     remember_me = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput)
+
+
+
+class PasswordForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'id': 'password', 'name': 'password', 'placeholder': 'Enter password'}))
+    

@@ -51,6 +51,8 @@ urlpatterns = [
     path("login/", login, name="login"),
     path("books/", book_list, name="books"),
     path('set-language/', set_language, name='set_language'),
+    path('password_strength/', password_strength, name='password_strength'),
+    path("validate_password_strength/", validate_password_strength, name="validate_password_strength"),
 
     # path("signin/", LoginView.as_view(), name="signin"),
     # path("test/", login_supabase, name="test"),

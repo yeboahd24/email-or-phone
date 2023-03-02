@@ -1228,3 +1228,107 @@ from .models import Book
 def book_list(request):
     books = Book.objects.all()
     return render(request, 'book_list.html', {'books': books})
+
+
+
+from django.shortcuts import render
+from django.http import JsonResponse
+import zxcvbn
+
+# @csrf_exempt
+# def validate_password_strength(request):
+#     password = request.POST.get('password')
+#     result = zxcvbn.zxcvbn(password)
+#     score = result['score']
+#     if score < 3:
+#         strength = 'Weak'
+#     elif score < 4:
+#         strength = 'Fair'
+#     else:
+#         strength = 'Strong'
+#     return JsonResponse({'strength': strength})
+
+
+
+
+from django.shortcuts import render
+import json
+import re
+from zxcvbn import zxcvbn
+
+def password_strength(request):
+        return render(request, 'password.html')
+
+
+
+
+# @csrf_exempt
+# def validate_password_strength(request):
+#     if request.method == 'POST':
+#         password = request.POST.get('password')
+#         score = calculate_password_strength(password)
+#         print(password)
+#         if score >= 10:
+#             strength = 'Strong'
+#             return JsonResponse({'strength': strength})
+
+#         elif score >= 5:
+#             strength = 'Fair'
+#             return JsonResponse({'strength': strength})
+
+#         else:
+#             strength = 'Weak'
+#             return JsonResponse({'strength': strength})
+
+# def calculate_password_strength(password):
+#     score = 0
+#     if len(password) < 8:
+#         return score
+#     score += 1
+#     if re.search(r'[a-z]', password):
+#         score += 1
+#     if re.search(r'[A-Z]', password):
+#         score += 1
+#     if re.search(r'[0-9]', password):
+#         score += 1
+#     if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+#         score += 1
+#     return score
+
+# @csrf_exempt
+# def validate_password_strength(request):
+#     if request.method == 'POST':
+#         password = request.POST.get('password', '')
+#         if password:
+#             # Calculate password strength score using zxcvbn library
+#             score = zxcvbn.password_strength(password)['score']
+#             if score > 8:
+#                 strength = 'Excellent'
+#             elif score > 5:
+#                 strength = 'Strong'
+#             elif score > 3:
+#                 strength = 'Fair'
+#             else:
+#                 strength = 'Weak'
+#             return JsonResponse({'strength': strength})
+#     return JsonResponse({'error': 'Invalid request method'})
+
+
+
+@csrf_exempt
+def validate_password_strength(request):
+    if request.method == 'POST':
+        password = request.POST.get('password', '')
+        result = zxcvbn(password)
+        score = result['score']
+        if score == 2:
+            return JsonResponse({'strength': 'Strong', 'score': score})
+        elif score == 1:
+            return JsonResponse({'strength': 'Fair', 'score': score})
+        elif score == 3:
+            return JsonResponse({'strength': 'Very Strong', 'score': score})
+
+        elif score == 4:
+            return JsonResponse({'strength': 'Excellent', 'score': score})
+        elif score == 0:
+            return JsonResponse({'strength': 'Weak', 'score': score})
