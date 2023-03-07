@@ -324,3 +324,6 @@ PARLER_LANGUAGES = {
 
 PARLER_DEFAULT_LANGUAGE_CODE = "en"
 SITE_NAME = "django"
+
+BASE_URL = 'http://localhost:8000'
+DEFAULT_FROM_EMAIL = 'admin@localhost.com'

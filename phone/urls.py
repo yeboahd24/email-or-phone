@@ -53,6 +53,17 @@ urlpatterns = [
     path('set-language/', set_language, name='set_language'),
     path('password_strength/', password_strength, name='password_strength'),
     path("validate_password_strength/", validate_password_strength, name="validate_password_strength"),
+    path("index/", index, name="index"),
+
+
+    path('signup1/', signup1, name='signup1'),
+    path('resend_verification/', resend_verification, name='resend_verification'),
+    path('verify-email-sent/', verify_email_sent, name='verify-email-sent'),
+    path('signup2/<str:username>/', signup2, name='signup2'),
+    path('verify-email/<str:username>/', verify_email, name='verify-email'),
+
+
+
 
     # path("signin/", LoginView.as_view(), name="signin"),
     # path("test/", login_supabase, name="test"),

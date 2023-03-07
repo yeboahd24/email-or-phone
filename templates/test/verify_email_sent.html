@@ -1,0 +1,11 @@
+{% extends 'test/base.html' %}
+
+{% block title %}Verify Email{% endblock %}
+
+{% block content %}
+  <div class="bg-white shadow-lg rounded-lg px-4 py-6">
+    <h2 class="text-2xl font-bold mb-4">Verify Your Email</h2>
+    <p class="mb-4">We've sent an email to {{ email }} with a verification link. Click the link to verify your email and continue with the sign-up process.</p>
+    <p>If you didn't receive the email, please check your spam folder or <a href="{% url 'resend_verification' %}?email={{ email }}">click here to resend the verification email</a>.</p>
+  </div>
+{% endblock %}

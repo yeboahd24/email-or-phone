@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}My Site{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  </head>
+  <body>
+    <header class="bg-gray-900 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center px-4">
+        <h1 class="text-2xl font-bold">{% block heading %}My Site{% endblock %}</h1>
+        <nav>
+          <ul class="flex space-x-4">
+            <li><a href="{% url 'success' %}" class="hover:text-gray-400">Home</a></li>
+            {% if user.is_authenticated %}
+              <li><a href="{% url 'logout' %}" class="hover:text-gray-400">Log out</a></li>
+            {% else %}
+              <li><a href="{% url 'login' %}" class="hover:text-gray-400">Log in</a></li>
+              <li><a href="{% url 'signup1' %}" class="hover:text-gray-400">Sign up</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="container mx-auto py-4 px-4">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

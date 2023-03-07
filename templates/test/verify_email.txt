@@ -1,0 +1,10 @@
+Hi {{ user.username }},
+
+Please click the following link to verify your email address and complete your sign-up:
+
+{{ protocol }}://{{ domain }}{% url 'verify_email' user.pk token %}
+
+If you did not sign up for an account, please ignore this email.
+
+Thanks,
+My Site

@@ -1332,3 +1332,106 @@ def validate_password_strength(request):
             return JsonResponse({'strength': 'Excellent', 'score': score})
         elif score == 0:
             return JsonResponse({'strength': 'Weak', 'score': score})
+
+
+
+
+from django.http import HttpResponse
+from . import rabbitmq
+
+def index(request):
+    rabbitmq.channel.basic_publish(
+        exchange='',
+        routing_key='hello',
+        body='Hello World!'
+    )
+    return HttpResponse("Message sent to RabbitMQ")
+
+
+
+from django.contrib.auth import authenticate, login
+from django.core.mail import send_mail
+from django.conf import settings
+from .forms import SignUpForm1
+
+def signup1(request):
+    if request.method == 'POST':
+        form = SignUpForm1(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            # Send email verification
+            subject = 'Verify your email'
+            message = 'Please click the link below to verify your email address: {0}'.format(settings.BASE_URL + '/verify-email/' + user.username)
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list)
+            return redirect('verify-email-sent')
+    else:
+        form = SignUpForm1()
+    return render(request, 'test/signup1.html', {'form': form})
+
+def verify_email_sent(request):
+    return render(request, 'test/verify_email_sent.html')
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from .forms import SignUpForm2
+
+
+def signup2(request, username):
+    user = get_user_model().objects.get(username=username)
+    if request.method == 'POST':
+        form = SignUpForm2(request.POST)
+        if form.is_valid():
+            user.phone = form.cleaned_data['phone']
+            user.set_password(form.cleaned_data['password1'])
+            user.is_active = True
+            user.save()
+            return redirect('login')
+    else:
+        form = SignUpForm2()
+    return render(request, 'test/signup2.html', {'form': form})
+
+
+
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.conf import settings
+
+User = get_user_model()
+
+def resend_verification(request):
+    email = request.GET.get('email')
+    if email:
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = None
+        if user is not None and not user.is_verified:
+            subject = 'Verify your email'
+            message = render_to_string('verify_email.txt', {'user': user})
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+            return redirect(reverse('verify_email_sent') + f'?email={email}')
+    return redirect('success')
+
+
+
+def verify_email(request, username):
+    user = User.objects.get(username=username)
+    user.is_active = True
+    user.save()
+    return redirect('signup2', username=username)

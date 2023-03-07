@@ -1,0 +1,10 @@
+{% extends 'test/base.html' %}
+
+{% block content %}
+  <h2>Step 2: Enter your phone number and password</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Sign up</button>
+  </form>
+{% endblock %}
