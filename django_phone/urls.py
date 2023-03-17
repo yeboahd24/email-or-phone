@@ -18,8 +18,9 @@ from django.urls import path, include, re_path
 from phone.views import *
 from phone.handlers import grpc_handlers as user_grpc_handlers
 from django.conf.urls.i18n import i18n_patterns
-
-
+from django.conf import settings
+from django.conf.urls.static import static
+from django_phone.settings import MEDIA_ROOT, MEDIA_URL
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -56,13 +57,13 @@ urlpatterns = [
     path("", include("phone.urls")),
     path("stopwatch/", stopwatch, name="stopwatch"),
     # path("", include("django_private_chat2.urls", namespace="django_private_chat2")),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += i18n_patterns(
-    path("", include("django_private_chat2.urls", namespace="django_private_chat2")), # parler
+    path(
+        "", include("django_private_chat2.urls", namespace="django_private_chat2")
+    ),  # parler
 )
-
-
 
 
 def grpc_handlers(server):

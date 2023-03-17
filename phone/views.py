@@ -1435,3 +1435,24 @@ def verify_email(request, username):
     user.is_active = True
     user.save()
     return redirect('signup2', username=username)
+
+
+
+
+
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from .serializers import ImageSerializer
+
+class ImageUploadView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = ImageSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = ImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        else:
+            return Response(serializer.errors, status=400)

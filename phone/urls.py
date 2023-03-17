@@ -61,6 +61,7 @@ urlpatterns = [
     path('verify-email-sent/', verify_email_sent, name='verify-email-sent'),
     path('signup2/<str:username>/', signup2, name='signup2'),
     path('verify-email/<str:username>/', verify_email, name='verify-email'),
+    path('upload-image/', ImageUploadView.as_view(), name='image-upload'),
 
 
 

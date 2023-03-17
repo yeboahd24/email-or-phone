@@ -361,3 +361,8 @@ class Book(TranslatableModel):
 
     def __str__(self):
         return self.title
+
+
+
+class Image(models.Model):
+    image = models.ImageField(upload_to='images/')

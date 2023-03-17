@@ -55,14 +55,14 @@ INSTALLED_APPS = [
     "channels",
     "django_private_chat2.apps.DjangoPrivateChat2Config",
     "crispy_forms",
-    'parler',
-
+    "parler",
+    "cloudinary",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    'django.middleware.locale.LocaleMiddleware', # new
+    "django.middleware.locale.LocaleMiddleware",  # new
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -73,10 +73,7 @@ MIDDLEWARE = [
 ]
 
 
-
-LOCALE_PATHS = (
-os.path.join(BASE_DIR, 'locale/'),
-)
+LOCALE_PATHS = (os.path.join(BASE_DIR, "locale/"),)
 
 ROOT_URLCONF = "django_phone.urls"
 
@@ -91,8 +88,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                'phone.context_processors.site_name', # new
-
+                "phone.context_processors.site_name",  # new
             ],
         },
     },
@@ -123,26 +119,25 @@ ASGI_SERVER = "daphne"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": os.path.join(BASE_DIR / "db.sqlite3"),
-#     }
-# }
-
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR / "db.sqlite3"),
+    }
+}
 
 
 # Postgresql Database (supabase)
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "YshAOOq208MIakMy",
-        "HOST": "db.ccfmytlvtfuhqhucbeuu.supabase.co",
-        "PORT": "5432",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "postgres",
+#         "USER": "postgres",
+#         "PASSWORD": "YshAOOq208MIakMy",
+#         "HOST": "db.ccfmytlvtfuhqhucbeuu.supabase.co",
+#         "PORT": "5432",
+#     }
+# }
 
 
 # Password validation
@@ -183,7 +178,8 @@ STATIC_URL = "static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
-
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -286,15 +282,15 @@ DICTIONARY_KEY = "15b1025e-5041-4d7b-9f7b-4f74bd0deabe"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 # ASGI_APPLICATION
 
-     
-SUPABASE_URL = 'https://ccfmytlvtfuhqhucbeuu.supabase.co'
-SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZm15dGx2dGZ1aHFodWNiZXV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzczNzQxMTgsImV4cCI6MTk5Mjk1MDExOH0.e63wPAN2hbaoKgSLtFvotZsS5bhG9uM-NBhawbbaPj0'
+
+SUPABASE_URL = "https://ccfmytlvtfuhqhucbeuu.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZm15dGx2dGZ1aHFodWNiZXV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzczNzQxMTgsImV4cCI6MTk5Mjk1MDExOH0.e63wPAN2hbaoKgSLtFvotZsS5bhG9uM-NBhawbbaPj0"
 
 
 # Language settings
 LANGUAGES = [
-    ('en', 'English'),
-    ('fr', 'French'),
+    ("en", "English"),
+    ("fr", "French"),
 ]
 
 # PARLER_LANGUAGES = {
@@ -325,5 +321,13 @@ PARLER_LANGUAGES = {
 PARLER_DEFAULT_LANGUAGE_CODE = "en"
 SITE_NAME = "django"
 
-BASE_URL = 'http://localhost:8000'
-DEFAULT_FROM_EMAIL = 'admin@localhost.com'
+BASE_URL = "http://localhost:8000"
+DEFAULT_FROM_EMAIL = "admin@localhost.com"
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": "koldchain",
+    "API_KEY": "579463126772261",
+    "API_SECRET": "0UuXhg8KozyyKiFzgXsr_F4BSy4",
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"

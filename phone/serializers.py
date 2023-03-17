@@ -220,3 +220,15 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return value
 
 
+import cloudinary.uploader
+from .models import Image
+
+class ImageSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Image
+        fields = ('id', 'image', 'url')
+
+    def get_url(self, obj):
+        return cloudinary.uploader.upload(obj.image)['url']
