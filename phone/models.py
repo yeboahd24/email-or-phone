@@ -366,3 +366,10 @@ class Book(TranslatableModel):
 
 class Image(models.Model):
     image = models.ImageField(upload_to='images/')
+
+
+class Message(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    text = models.TextField()
+    unread = models.BooleanField(default=True)

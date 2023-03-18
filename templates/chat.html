@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chat App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		var last_timestamp = null;
+
+		function pollMessages() {
+			$.get('/get_messages/', {last_timestamp: last_timestamp}, function(data) {
+				if (data.messages.length > 0) {
+					// Update chat interface with new messages
+					for (var i = 0; i < data.messages.length; i++) {
+						var message = data.messages[i];
+						$('#chat-messages').append('<div><span class="message-username font-bold text-gray-700">' + message.user + '</span><span class="message-timestamp text-gray-500 text-sm">' + message.timestamp + '</span><div class="message-text text-gray-800">' + message.text + '</div></div>');
+					}
+					// Update last_timestamp to the timestamp of the last message
+					last_timestamp = data.messages[data.messages.length-1].timestamp;
+				}
+				setTimeout(pollMessages, 1000); // Poll again in 1 second
+			});
+		}
+
+		function sendMessage() {
+			var text = $('#chat-input').val();
+			$.post('/send_message/', {'text': text}, function(data) {
+				// Clear the chat input field
+				$('#chat-input').val('');
+			});
+		}
+
+		$(function() {
+			pollMessages();
+			$('#chat-form').submit(function(event) {
+				event.preventDefault();
+				sendMessage();
+			});
+		});
+	</script>
+</head>
+<body class="bg-gray-100">
+	<div class="container mx-auto mt-4">
+		<div class="bg-white rounded-lg shadow-lg p-4">
+			<div id="chat-messages" class="mb-4">
+				<!-- Chat messages will be dynamically added here -->
+			</div>
+			<form id="chat-form" class="flex items-center">
+				<input id="chat-input" type="text" class="rounded-l-lg py-2 px-4 border-gray-300 bg-gray-200 w-full text-gray-800" placeholder="Type your message...">
+				<button class="px-4 rounded-r-lg bg-blue-500 text-white font-bold py-2 uppercase ml-2" type="submit">Send</button>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

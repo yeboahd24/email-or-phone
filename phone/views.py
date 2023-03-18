@@ -1456,3 +1456,39 @@ class ImageUploadView(APIView):
             return Response(serializer.data, status=201)
         else:
             return Response(serializer.errors, status=400)
+
+
+
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Message
+
+@login_required
+@csrf_exempt
+def get_messages(request):
+    last_timestamp = request.GET.get('last_timestamp')
+    if last_timestamp:
+        messages = Message.objects.filter(timestamp__gt=last_timestamp, unread=True)
+    else:
+        messages = Message.objects.filter(unread=True)
+    data = [{'user': m.user.username, 'timestamp': m.timestamp.isoformat(), 'text': m.text} for m in messages]
+    for m in messages:
+        m.unread = False
+        m.save()
+    return JsonResponse({'messages': data})
+
+
+@login_required
+@csrf_exempt
+def send_message(request):
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        if text:
+            message = Message(user=request.user, text=text)
+            message.save()
+    return JsonResponse({'status': 'ok'})
+
+
+def chat_view(request):
+    return render(request, 'chat.html')
