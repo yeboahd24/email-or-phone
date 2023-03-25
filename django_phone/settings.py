@@ -119,12 +119,30 @@ ASGI_SERVER = "daphne"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": os.path.join(BASE_DIR / "db.sqlite3"),
+#     }
+# }
+
+
 DATABASES = {
-    "default": {
+   "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR / "db.sqlite3"),
+    },
+    "supabase": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "YshAOOq208MIakMy",
+        "HOST": "db.ccfmytlvtfuhqhucbeuu.supabase.co",
+        "PORT": "5432",
     }
 }
+
+DATABASE_ROUTERS = ['phone.db_route.BlogDatabaseRouter']
 
 
 # Postgresql Database (supabase)

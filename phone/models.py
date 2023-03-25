@@ -196,6 +196,8 @@ class Stroke(models.Model):
     def __str__(self):
         return "Stroke({}) for user: {}".format(self.id, self.user)
 
+ 
+
 
 from datetime import datetime
 from dateutil import rrule
@@ -373,3 +375,28 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     text = models.TextField()
     unread = models.BooleanField(default=True)
+
+
+
+
+
+class Signup(models.Model):
+    # fields for signup model
+    username = models.CharField(max_length=50)
+    email = models.EmailField(max_length=100)
+    password = models.CharField(max_length=50)
+
+    class Meta:
+        db_table = 'signup'
+        app_label = 'blog'
+        managed = True
+
+class Posts(models.Model):
+    # fields for posts model
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+
+    class Meta:
+        db_table = 'posts'
+        app_label = 'blog'
+        managed = True
